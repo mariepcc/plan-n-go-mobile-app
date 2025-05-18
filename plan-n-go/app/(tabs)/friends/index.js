@@ -34,28 +34,30 @@ export default function FriendsIndex() {
 
   async function loadContacts(userId) {
     const { data, error } = await supabase
-    .from("contacts")
-    .select(`
+      .from("contacts")
+      .select(
+        `
       profile_id,
       profiles!contacts_profile_id_fkey (
         id,
         username
       )
-    `)
-    .eq("owner_id", userId)
-    .order("created_at", { ascending: false });
+    `
+      )
+      .eq("owner_id", userId)
+      .order("created_at", { ascending: false });
 
-    console.log("Contacts raw data:", data);
 
-    setProfiles(data?.map(profile => ({
-  ...profile,
-  type: "profile"
-})) ?? []);
+    setProfiles(
+      data?.map((profile) => ({
+        ...profile,
+        type: "profile",
+      })) ?? []
+    );
+    console.log("Contacts data:", profiles);
 
-    
-      
-    }
-  
+
+  }
 
   async function handleAddContact(profileId) {
     const { error } = await supabase.from("contacts").insert({
@@ -117,26 +119,29 @@ export default function FriendsIndex() {
         <FlatList
           data={[...profiles, ...contacts]}
           keyExtractor={(item) => `${item.type}-${item.id}`}
-          renderItem={({ item }) => (
-            item.type === 'contact' ? (
-            <ContactRow item={item} handleDeleteContact={handleDeleteContact} />
-          ) : (
-            <ProfileRow item={item} handleAddContact={handleAddContact} />
-          )
-          )}
+          renderItem={({ item }) =>
+            item.type === "contact" ? (
+              <ContactRow
+                item={item}
+                handleDeleteContact={handleDeleteContact}
+              />
+            ) : (
+              <ProfileRow item={item} handleAddContact={handleAddContact} />
+            )
+          }
         />
         <View style={styles.verticallySpaced}>
-  <TouchableOpacity
-    onPress={() => user && loadContacts(user.id)}
-    style={styles.buttonContainer}
-  >
-    <Text style={styles.buttonText}>DEBUG LOAD CONTACTS</Text>
-  </TouchableOpacity>
-</View>
+          <TouchableOpacity
+            onPress={() => user && loadContacts(user.id)}
+            style={styles.buttonContainer}
+          >
+            <Text style={styles.buttonText}>DEBUG LOAD CONTACTS</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   verticallySpaced: {

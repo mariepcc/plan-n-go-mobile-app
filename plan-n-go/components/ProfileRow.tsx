@@ -5,19 +5,24 @@ export function ProfileRow({
   item,
   handleAddContact,
 }: {
-  item: { id: string; username: string };
+  item: {
+    profiles: {
+      id: string;
+      username: string;
+    };
+  };
   handleAddContact: (id: string) => void;
 }) {
   return (
     <TouchableOpacity
       style={styles.rowContainer}
-      onPress={() => handleAddContact(item.id)}
+      onPress={() => handleAddContact(item.profiles.id)}
     >
       <View style={styles.textContainer}>
         <Text style={styles.name}>Profile</Text>
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.name}>@{item.username}</Text>
+        <Text style={styles.name}>@{item.profiles.username}</Text>
       </View>
       <View style={styles.actionContainer}>
         <Text style={styles.actionText}>+ Add</Text>
