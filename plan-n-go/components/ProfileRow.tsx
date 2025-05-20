@@ -1,31 +1,32 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+
 
 export function ProfileRow({
   item,
   handleAddContact,
 }: {
   item: {
-    profiles: {
-      id: string;
-      username: string;
-    };
+    id: string;
+    username: string;
   };
+
   handleAddContact: (id: string) => void;
 }) {
   return (
     <TouchableOpacity
       style={styles.rowContainer}
-      onPress={() => handleAddContact(item.profiles.id)}
+      onPress={() => handleAddContact(item.id)}
     >
       <View style={styles.textContainer}>
         <Text style={styles.name}>Profile</Text>
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.name}>@{item.profiles.username}</Text>
+        <Text style={styles.name}>@{item.username}</Text>
       </View>
       <View style={styles.actionContainer}>
-        <Text style={styles.actionText}>+ Add</Text>
+        <FontAwesome name="plus" size={20} color="#ffffff" />
       </View>
     </TouchableOpacity>
   );
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   actionContainer: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: "#000968",
+    backgroundColor: "#93c47d",
     borderRadius: 6,
   },
   actionText: {

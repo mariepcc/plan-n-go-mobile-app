@@ -18,6 +18,7 @@ import { Stack } from "expo-router";
 export default function FriendsIndex() {
   const [user, setUser] = useState(null);
   const [search, setSearch] = useState("");
+  const [noResults, setNoResults] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [contacts, setContacts] = useState([]);
 
@@ -47,16 +48,13 @@ export default function FriendsIndex() {
       .eq("owner_id", userId)
       .order("created_at", { ascending: false });
 
-
-    setProfiles(
+    setContacts(
       data?.map((profile) => ({
         ...profile,
-        type: "profile",
+        type: "contact",
       })) ?? []
     );
-    console.log("Contacts data:", profiles);
-
-
+    console.log("Contacts data:", contacts);
   }
 
   async function handleAddContact(profileId) {
@@ -86,14 +84,26 @@ export default function FriendsIndex() {
   }
 
   async function handleProfileSearch() {
+    if (!search.trim()) {
+      setProfiles([]);
+      setNoResults(false);
+      return;
+    }
     const { data, error } = await supabase
       .from("profiles")
       .select("id, username")
       .ilike("username", `%${search}%`)
       .neq("id", user?.id);
 
-    setProfiles(data ?? []);
-    console.log("Profile:", data);
+    const filtered = (data ?? []).filter(
+      (p) => !contacts.some((c) => c.profile_id === p.id)
+    );
+
+    setProfiles(filtered ?? []);
+    setNoResults(filtered.length === 0);
+    console.log("search text:", search);
+
+    console.log("filtered:", filtered);
   }
 
   return (
@@ -115,10 +125,15 @@ export default function FriendsIndex() {
             <Text style={styles.buttonText}>SEARCH</Text>
           </TouchableOpacity>
         </View>
+        {noResults && (
+          <Text style={{ textAlign: "center", color: "gray", marginBottom: 8 }}>
+            No user found.
+          </Text>
+        )}
 
         <FlatList
           data={[...profiles, ...contacts]}
-          keyExtractor={(item) => `${item.type}-${item.id}`}
+          extraData={contacts}
           renderItem={({ item }) =>
             item.type === "contact" ? (
               <ContactRow
@@ -130,14 +145,6 @@ export default function FriendsIndex() {
             )
           }
         />
-        <View style={styles.verticallySpaced}>
-          <TouchableOpacity
-            onPress={() => user && loadContacts(user.id)}
-            style={styles.buttonContainer}
-          >
-            <Text style={styles.buttonText}>DEBUG LOAD CONTACTS</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     </SafeAreaView>
   );
@@ -156,7 +163,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    backgroundColor: "#000968",
+    backgroundColor: "#23a392",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,

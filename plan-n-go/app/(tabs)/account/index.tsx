@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase-client";
 import {
+  SafeAreaView,
   StyleSheet,
   View,
   Alert,
@@ -9,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { Stack } from "expo-router";
 
 export default function Account() {
   const [user, setUser] = useState(null);
@@ -89,41 +91,46 @@ export default function Account() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: "#eee" }]}
-          value={user?.email ?? ""}
-          editable={false}
-        />
-      </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Screen options={{ headerShown: true, title: "Account" }} />
 
-      <View style={styles.verticallySpaced}>
-        <Text style={styles.label}>Username</Text>
-        <TextInput
-          style={styles.input}
-          value={user?.username}
-          onChangeText={setUsername}
-          editable={!loading}
-          placeholder={user?.username ?? ""}
-        />
-      </View>
+      <View style={styles.container}>
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: "#eee" }]}
+            value={user?.email ?? ""}
+            editable={false}
+          />
+        </View>
 
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? "Loading..." : "Update"}
-          onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
-          disabled={loading}
-        />
-      </View>
+        <View style={styles.verticallySpaced}>
+          <Text style={styles.label}>Username</Text>
+          <TextInput
+            style={styles.input}
+            value={user?.username}
+            onChangeText={setUsername}
+            editable={!loading}
+            placeholder={user?.username ?? ""}
+          />
+        </View>
 
-      <View style={styles.verticallySpaced}>
-        <TouchableOpacity onPress={doLogout} style={styles.buttonContainer}>
-          <Text style={styles.buttonText}>LOGOUT</Text>
-        </TouchableOpacity>
+        <View style={[styles.verticallySpaced, styles.mt20]}>
+          <Button
+            title={loading ? "Loading..." : "Update"}
+            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
+            disabled={loading}
+            color="#000968"
+          />
+        </View>
+
+        <View style={styles.verticallySpaced}>
+          <TouchableOpacity onPress={doLogout} style={styles.buttonContainer}>
+            <Text style={styles.buttonText}>LOGOUT</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -152,7 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonContainer: {
-    backgroundColor: "#000968",
+    backgroundColor: "#a64d79",
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,

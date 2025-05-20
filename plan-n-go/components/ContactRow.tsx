@@ -1,41 +1,67 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-export function ContactRow({ item, handleDeleteContact }) {
+
+export function ContactRow({
+  item,
+  handleDeleteContact,
+}: {
+  item: {
+    profiles: {
+      id: string;
+      username: string;
+    };
+  };
+  handleDeleteContact: (id: string) => void;
+}) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.username}>{item.username}</Text>
-      <TouchableOpacity
-        onPress={() => handleDeleteContact(item.id)}
-        style={styles.removeButton}
-      >
-        <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      style={styles.rowContainer}
+      onPress={() => handleDeleteContact(item.profiles.id)}
+    >
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>Friend</Text>
+      </View>
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>@{item.profiles.username}</Text>
+      </View>
+      <View style={styles.actionContainer}>
+        <FontAwesome name="trash" size={20} color="#ffffff" />
+      </View>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 12,
-    marginVertical: 6,
-    backgroundColor: "#fce4ec",
-    borderRadius: 10,
+  rowContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-  },
-  username: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  removeButton: {
-    backgroundColor: "#ff3b30",
+    paddingVertical: 12,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+    borderBottomWidth: 1,
+    borderColor: "#ddd",
+    justifyContent: "space-between",
   },
-  removeButtonText: {
+  textContainer: {
+    flex: 1,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#333",
+  },
+  handle: {
+    fontSize: 14,
+    color: "#666",
+  },
+  actionContainer: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#e06666",
+    borderRadius: 6,
+  },
+  actionText: {
     color: "#fff",
     fontWeight: "bold",
   },
