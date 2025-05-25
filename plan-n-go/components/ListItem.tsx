@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {
   title: string;
@@ -8,25 +9,30 @@ type Props = {
 export default function ListItem({ title, subTitle }: Props) {
   return (
     <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-      {subTitle && <Text style={styles.subTitle}>{subTitle}</Text>}
+      <View>
+        <Text style={styles.title}>{title}</Text>
+        {subTitle && <Text style={styles.subTitle}>{subTitle}</Text>}
+      </View>
+      <FontAwesome name="plus" size={20} color="#666" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   item: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderColor: "#ddd",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   title: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   subTitle: {
-    fontSize: 14,
-    color: '#888',
+    fontSize: 12,
+    color: "#666",
   },
 });

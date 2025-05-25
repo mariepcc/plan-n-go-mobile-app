@@ -26,9 +26,39 @@ export default function TabsLayout() {
           title: "Groups",
           tabBarIcon: ({ color }) => (
             <FontAwesome
-              size={28}
+              size={22}
               style={{ marginBottom: -3 }}
               name="group"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="friends"
+        options={{
+          tabBarLabel: "Friends",
+          title: "Friends",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome
+              size={22}
+              style={{ marginBottom: -3 }}
+              name="heart"
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          tabBarLabel: "Account",
+          title: "Account",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome
+              size={22}
+              style={{ marginBottom: -3 }}
+              name="user"
               color={color}
             />
           ),

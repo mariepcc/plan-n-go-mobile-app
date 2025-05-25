@@ -37,13 +37,13 @@ export function MemberSelector({
         )
         .eq('owner_id', userId)
         .order('created_at', { ascending: false });
-        console.log("do dodania: ", contacts)
 
 
       if (error) {
         console.error('Error fetching contacts:', error);
       } else {
         setContacts(data ?? []);
+
       }
     };
 
@@ -58,6 +58,8 @@ export function MemberSelector({
       } else {
         newSet.add(contactId);
       }
+      console.log("do dodania: ", selectedContacts)
+
       return newSet;
     });
   };

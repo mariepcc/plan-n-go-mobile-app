@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useNavigation } from 'expo-router';
 import { supabase } from "../../lib/supabase-client";
 import { ContactRow } from "../../../components/ContactRow";
 import { ProfileRow } from "../../../components/ProfileRow";
@@ -21,6 +22,7 @@ export default function FriendsIndex() {
   const [noResults, setNoResults] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [contacts, setContacts] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -32,6 +34,16 @@ export default function FriendsIndex() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setSearch('');
+      setProfiles([]);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
 
   async function loadContacts(userId) {
     const { data, error } = await supabase

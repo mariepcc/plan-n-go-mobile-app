@@ -11,6 +11,7 @@ import {
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { MemberSelector } from "../../../components/MemberSelector";
+import { uuid } from "../../lib/uuid";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function CreateGroupScreen() {
@@ -40,30 +41,31 @@ export default function CreateGroupScreen() {
   }, [initialName]);
 
   const handleCreateGroup = async () => {
+    const groupId = uuid();
     if (!groupName.trim()) {
       Alert.alert("Error", "Please enter a group name.");
       return;
     }
     try {
-      const { data: group, error } = await supabase
+      const { data: group, error: groupError } = await supabase
         .from("groups")
-        .insert({ name: groupName, owner_id: user.id })
-        .select()
-        .single();
+        .insert({ id: groupId, name: groupName, owner_id: user.id });
 
-      const groupId = group.id;
+      
+      const { data, error: membershipError } = await supabase
+        .from("memberships")
+        .insert([
+          ...Array.from(selectedContacts).map((profileId) => ({
+            group_id: groupId,
+            profile_id: profileId,
+          })),
+          { group_id: groupId, profile_id: user.id },
+        ]);
 
-      await supabase.from("memberships").insert([
-        ...Array.from(selectedContacts).map((profileId) => ({
-          group_id: groupId,
-          profileId,
-        })),
-        { group_id: groupId, profile_id: user.id },
-      ]);
-      router.push(`/groups/${groupId}`);
+        router.push(`/groups/${groupId}`);
     } catch (error) {
       console.error(error);
-      Alert.alert("Error", "Could not create group.");
+      Alert.alert("Error", error);
     }
   };
 
@@ -118,10 +120,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 6,
-    marginRight: 10, 
+    marginRight: 10,
   },
   actionContainer: {
-    height: 48, 
+    height: 48,
     width: 48,
     backgroundColor: "#e06666",
     justifyContent: "center",

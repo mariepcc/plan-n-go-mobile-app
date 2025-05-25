@@ -22,7 +22,7 @@ export default function Account() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
-        getProfile();
+        getProfile(user); // pass user explicitly here
       } else {
         Alert.alert("Error Accessing User");
       }
@@ -36,14 +36,14 @@ export default function Account() {
     }
   };
 
-  async function getProfile() {
+  async function getProfile(currentUser) {
     try {
       setLoading(true);
-      if (!user) throw new Error("No user on the session!");
+      if (!currentUser) throw new Error("No user on the session!");
       const { data, error, status } = await supabase
         .from("profiles")
         .select(`username, avatar_url`)
-        .eq("id", user.id)
+        .eq("id", currentUser.id)
         .single();
       if (error && status !== 406) {
         throw error;
@@ -108,10 +108,10 @@ export default function Account() {
           <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            value={user?.username}
+            value={username} // use username state here, not user?.username
             onChangeText={setUsername}
             editable={!loading}
-            placeholder={user?.username ?? ""}
+            placeholder={username ?? ""}
           />
         </View>
 

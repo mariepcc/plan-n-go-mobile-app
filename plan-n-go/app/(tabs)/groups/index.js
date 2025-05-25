@@ -19,6 +19,12 @@ export default function GroupsPage() {
   const [groups, setGroups] = useState([]);
   const navigation = useNavigation();
 
+  const groupsToShow = search
+  ? groups.filter((group) =>
+      group.name.toLowerCase().includes(search.toLowerCase())
+    )
+  : groups;
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
@@ -30,25 +36,32 @@ export default function GroupsPage() {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setSearch('');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  
+
+  useEffect(() => {
     async function groupSearch() {
       const { data, error } = await supabase
         .from("groups")
         .select("id, name")
-        .ilike("name", `%${search}%`);
+      
 
       if (error) {
         console.error("Error fetching groups:", error);
       } else {
         setGroups(data);
+        console.log("groups:", data)
       }
     }
 
-    if (search.length > 0) {
       groupSearch();
-    } else {
-      setGroups([]);
-    }
-  }, [search, setGroups]);
+  }, [setGroups]);
 
   const newGroup = search ? [{ type: "create", name: search }] : [];
 
@@ -68,7 +81,7 @@ export default function GroupsPage() {
               <Text>Time to create new groups!</Text>
             </View>
           }
-          data={[...newGroup, ...groups]}
+          data={[...newGroup, ...groupsToShow]}
           renderItem={({ item }) =>
             item.type === "create" ? (
               <Link
@@ -85,7 +98,7 @@ export default function GroupsPage() {
             ) : (
               <Link
                 href={`/groups/${
-                  item.group_id
+                  item.id
                 }`}
               >
                 <ListItem
