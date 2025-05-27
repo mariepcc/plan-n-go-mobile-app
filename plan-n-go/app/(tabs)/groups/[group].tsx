@@ -1,12 +1,25 @@
-import { Text, View, StyleSheet, Alert } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+} from "react-native";
+import { Stack } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase-client";
+import { useNavigation } from "@react-navigation/native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function GroupInfoScreen() {
   const { group: groupId } = useLocalSearchParams<{ group: string }>();
   const [name, setName] = useState<string>("");
+  const [meetingName, setMeetingName] = useState<string>("");
   const [members, setMembers] = useState<any[]>([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -18,46 +31,56 @@ export default function GroupInfoScreen() {
     });
   }, []);
 
+  
+
   async function groupSearch() {
     const { data, error } = await supabase
-      .from("groups")
-      .select(
-        `
-        id,
-        name,
-        memberships (
-          profiles:profile_id (
-            username
-          )
-        )
-      `
-      )
-      .eq("id", groupId)
-      .single();
+      .from("group_members")
+      .select("group_name, username")
+      .eq("group_id", groupId);
 
     if (error) {
       console.error("Error fetching group info:", error);
       console.log("error:", error);
     } else {
-      setName(data.name);
-      setMembers(
-        data.memberships.flatMap((m) => m.profiles.map((p) => p.username))
-      );
+      setName(data[0]?.group_name || "");
+      setMembers(data.map((item) => item.username));
       console.log("Members:", members);
     }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Group Info</Text>
-      <Text style={styles.subtitle}>Group name: {name}</Text>
-      <View style={styles.membersList}>
-        <Text style={styles.subtitle}>Members:</Text>
-        {members.map((username) => (
-          <Text>• {username}</Text>
-        ))}
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Screen
+        options={{ title: name }}
+      />
+      <View style={styles.container}>
+        <Text style={styles.title}>Group Info</Text>
+        <Text style={styles.subtitle}>Group name: {name}</Text>
+        <View style={styles.membersList}>
+          <Text style={styles.subtitle}>Members:</Text>
+          {members.map((username) => (
+            <Text key={username}>• {username}</Text>
+          ))}
+        </View>
+        <View style={styles.container}>
+          <Text style={styles.title}>Add meeting:</Text>
+          <View style={styles.inputRow}>
+            <TextInput
+              placeholder="Enter group name"
+              style={styles.input}
+              value={meetingName}
+              onChangeText={setMeetingName}
+            />
+            <TouchableOpacity>
+              <View style={styles.actionContainer}>
+                <FontAwesome name="plus" size={24} color="#ffffff" />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -80,5 +103,27 @@ const styles = StyleSheet.create({
   membersList: {
     marginTop: 20,
     paddingHorizontal: 16,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  actionContainer: {
+    height: 48,
+    width: 48,
+    backgroundColor: "#e06666",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 6,
   },
 });

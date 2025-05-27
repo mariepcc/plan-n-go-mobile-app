@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import ListItem from "../../../components/ListItem"
+import ListItem from "../../../components/ListItem";
+import GroupRow from "../../../components/GroupRow";
 import { Link, useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function GroupsPage() {
   const [user, setUser] = useState(null);
@@ -20,10 +22,10 @@ export default function GroupsPage() {
   const navigation = useNavigation();
 
   const groupsToShow = search
-  ? groups.filter((group) =>
-      group.name.toLowerCase().includes(search.toLowerCase())
-    )
-  : groups;
+    ? groups.filter((group) =>
+        group.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : groups;
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -36,32 +38,30 @@ export default function GroupsPage() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      setSearch('');
+    const unsubscribe = navigation.addListener("blur", () => {
+      setSearch("");
     });
 
     return unsubscribe;
   }, [navigation]);
 
-  
+  useFocusEffect(
+    useCallback(() => {
+      async function groupSearch() {
+        const { data, error } = await supabase
+          .from("groups")
+          .select("id, name");
 
-  useEffect(() => {
-    async function groupSearch() {
-      const { data, error } = await supabase
-        .from("groups")
-        .select("id, name")
-      
-
-      if (error) {
-        console.error("Error fetching groups:", error);
-      } else {
-        setGroups(data);
-        console.log("groups:", data)
+        if (error) {
+          console.error("Error fetching groups:", error);
+        } else {
+          setGroups(data);
+        }
       }
-    }
 
       groupSearch();
-  }, [setGroups]);
+    }, [])
+  );
 
   const newGroup = search ? [{ type: "create", name: search }] : [];
 
@@ -90,20 +90,11 @@ export default function GroupsPage() {
                   params: { name: item.name },
                 }}
               >
-                <ListItem
-                  title={item.name}
-                  subTitle={'Create new group'}
-                />
+                <ListItem title={item.name} subTitle={"Create new group"} />
               </Link>
             ) : (
-              <Link
-                href={`/groups/${
-                  item.id
-                }`}
-              >
-                <ListItem
-                  title={item.name}
-                />
+              <Link href={`/groups/${item.id}`}>
+                <GroupRow title={item.name} />
               </Link>
             )
           }

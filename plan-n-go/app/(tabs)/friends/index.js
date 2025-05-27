@@ -9,11 +9,10 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { useNavigation } from 'expo-router';
+import { useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { ContactRow } from "../../../components/ContactRow";
 import { ProfileRow } from "../../../components/ProfileRow";
-
 import { Stack } from "expo-router";
 
 export default function FriendsIndex() {
@@ -36,28 +35,19 @@ export default function FriendsIndex() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      setSearch('');
+    const unsubscribe = navigation.addListener("blur", () => {
+      setSearch("");
       setProfiles([]);
     });
 
     return unsubscribe;
   }, [navigation]);
 
-
   async function loadContacts(userId) {
     const { data, error } = await supabase
-      .from("contacts")
-      .select(
-        `
-      profile_id,
-      profiles!contacts_profile_id_fkey (
-        id,
-        username
-      )
-    `
-      )
-      .eq("owner_id", userId)
+      .from("user_contacts")
+      .select("*")
+      .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     setContacts(
@@ -66,14 +56,20 @@ export default function FriendsIndex() {
         type: "contact",
       })) ?? []
     );
-    console.log("Contacts data:", contacts);
+    console.log("Contacts data:", error);
   }
 
   async function handleAddContact(profileId) {
-    const { error } = await supabase.from("contacts").insert({
-      owner_id: user.id,
-      profile_id: profileId,
-    });
+    const { error } = await supabase.from("contacts").insert([
+    {
+      user_id: user.id,
+      friend_id: profileId,
+    },
+    {
+      user_id: profileId,
+      friend_id: user.id,
+    },
+  ]);
 
     setSearch("");
     setProfiles([]);
@@ -90,7 +86,7 @@ export default function FriendsIndex() {
     await supabase
       .from("contacts")
       .delete()
-      .match({ owner_id: user.id, profile_id: profileId });
+      .match({ user_id: user.id, friend_id: profileId });
 
     loadContacts(user.id);
   }
@@ -115,7 +111,7 @@ export default function FriendsIndex() {
     setNoResults(filtered.length === 0);
     console.log("search text:", search);
 
-    console.log("filtered:", filtered);
+    console.log("filtered:", error);
   }
 
   return (

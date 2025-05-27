@@ -8,23 +8,21 @@ export function ContactRow({
   handleDeleteContact,
 }: {
   item: {
-    profiles: {
-      id: string;
-      username: string;
-    };
+    friend_id: string;
+    username: string;
   };
   handleDeleteContact: (id: string) => void;
 }) {
   return (
     <TouchableOpacity
       style={styles.rowContainer}
-      onPress={() => handleDeleteContact(item.profiles.id)}
+      onPress={() => handleDeleteContact(item.friend_id)}
     >
       <View style={styles.textContainer}>
         <Text style={styles.name}>Friend</Text>
       </View>
       <View style={styles.textContainer}>
-        <Text style={styles.name}>@{item.profiles.username}</Text>
+        <Text style={styles.name}>@{item.username}</Text>
       </View>
       <View style={styles.actionContainer}>
         <FontAwesome name="trash" size={20} color="#ffffff" />

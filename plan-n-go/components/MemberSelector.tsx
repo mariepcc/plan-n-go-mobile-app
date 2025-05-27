@@ -25,18 +25,10 @@ export function MemberSelector({
   useEffect(() => {
     const loadContacts = async () => {
       const { data, error } = await supabase
-        .from('contacts')
-        .select(
-          `
-          profile_id,
-          profiles!contacts_profile_id_fkey (
-            id,
-            username
-          )
-        `
-        )
-        .eq('owner_id', userId)
-        .order('created_at', { ascending: false });
+      .from("user_contacts")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
 
       if (error) {
@@ -77,22 +69,22 @@ export function MemberSelector({
 
       <FlatList
         data={contacts.filter((c) =>
-          c.profiles.username.toLowerCase().includes(search.toLowerCase())
+          c.username.toLowerCase().includes(search.toLowerCase())
         )}
-        keyExtractor={(item) => item.profile_id.toString()}
+        keyExtractor={(item) => item.friend_id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.listItem}
-            onPress={() => handleContactSelection(item.profile_id)}
+            onPress={() => handleContactSelection(item.friend_id)}
           >
             <View style={styles.iconLeft}>
               <FontAwesome name="user" size={20} />
             </View>
             <View style={styles.textContainer}>
-              <Text style={styles.name}>@{item.profiles.username}</Text>
+              <Text style={styles.name}>@{item.username}</Text>
             </View>
             <View style={styles.iconRight}>
-              {selectedContacts.has(item.profile_id) ? (
+              {selectedContacts.has(item.friend_id) ? (
                 <FontAwesome name="check-circle" size={20} color="#007AFF" />
               ) : (
                 <FontAwesome name="circle-thin" size={20} />
