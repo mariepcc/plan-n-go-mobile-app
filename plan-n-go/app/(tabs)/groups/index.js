@@ -93,7 +93,12 @@ export default function GroupsPage() {
                 <ListItem title={item.name} subTitle={"Create new group"} />
               </Link>
             ) : (
-              <Link href={`/groups/${item.id}`}>
+              <Link
+                href={{
+                  pathname: `/groups/${item.id}`,
+                  params: { name: item.name },
+                }}
+              >
                 <GroupRow title={item.name} />
               </Link>
             )

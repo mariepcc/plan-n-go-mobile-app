@@ -16,7 +16,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 export default function CreateGroupScreen() {
   const [user, setUser] = useState(null);
-
   const { name: initialName } = useLocalSearchParams<{ name: string }>();
   const [groupName, setGroupName] = useState("");
   const [selectedContacts, setSelectedContacts] = useState<Set<string>>(
