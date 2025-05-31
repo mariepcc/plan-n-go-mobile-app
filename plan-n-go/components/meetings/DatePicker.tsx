@@ -32,6 +32,8 @@ const DatePicker = ({ selectedDateCallback }) => {
         mode="datetime"
         onConfirm={handleConfirm}
         onCancel={hideDatePicker}
+        display="spinner"
+        themeVariant="light"
       />
     </View>
   );

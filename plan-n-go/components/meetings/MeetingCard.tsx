@@ -10,8 +10,8 @@ import {
   UIManager,
 } from "react-native";
 import React, { useState } from "react";
-import DatePicker from "./DatePicker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { format } from "date-fns";
 
 if (
   Platform.OS === "android" &&
@@ -39,7 +39,14 @@ export default function MeetingCard({
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={toggleExpand} style={styles.titleHeader}>
-        <Text style={styles.titleText}>{title}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.titleText}>{title}</Text>
+          <View>
+            <Text style={styles.datePreview}>
+              {format(date, "MMMM d, yyyy h:mm a")}
+            </Text>
+          </View>
+        </View>
         <Ionicons
           name={expanded ? "chevron-up" : "chevron-down"}
           size={22}
@@ -50,15 +57,6 @@ export default function MeetingCard({
       {expanded && (
         <>
           <View style={styles.divider} />
-          <View style={styles.selectedDateContainer}>
-            <Ionicons
-              name="calendar-outline"
-              size={20}
-              color="#fff"
-              style={styles.icon}
-            />
-            <Text style={styles.selectedDate}>{date.toDateString()}</Text>
-          </View>
           <Text>Places ideas: </Text>
         </>
       )}
@@ -89,9 +87,13 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 12,
-
+    marginBottom: 4,
     color: "#7a297a",
+  },
+  datePreview: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 2,
   },
   divider: {
     height: 1,
@@ -104,15 +106,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 16,
   },
-  selectedDateContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#741b47",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    alignSelf: "flex-start",
-  },
   selectedDate: {
     color: "#fff",
     fontSize: 16,
@@ -120,5 +113,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 8,
+    color: "#fff",
   },
 });

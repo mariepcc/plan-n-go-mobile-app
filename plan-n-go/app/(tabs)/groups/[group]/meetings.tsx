@@ -101,7 +101,7 @@ export default function MeetingsTab() {
         <MeetingCard
           key={meeting.id}
           title={meeting.title}
-          date={new Date(meeting.scheduled_by)}
+          date={new Date(meeting.scheduled_at)}
           userId={meeting.created_by}
         />
       ))}
