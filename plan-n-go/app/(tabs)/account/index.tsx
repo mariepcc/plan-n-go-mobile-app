@@ -22,7 +22,7 @@ export default function Account() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
         setUser(user);
-        getProfile(user); // pass user explicitly here
+        getProfile(user);
       } else {
         Alert.alert("Error Accessing User");
       }
@@ -108,7 +108,7 @@ export default function Account() {
           <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            value={username} // use username state here, not user?.username
+            value={username} 
             onChangeText={setUsername}
             editable={!loading}
             placeholder={username ?? ""}

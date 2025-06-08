@@ -12,8 +12,6 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../../lib/supabase-client";
 
-
-
 export default function MembersTab() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
   const [members, setMembers] = useState<any[]>([]);

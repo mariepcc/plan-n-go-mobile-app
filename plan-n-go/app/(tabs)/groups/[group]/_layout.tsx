@@ -20,12 +20,14 @@ export const MaterialTopTabs = withLayoutContext<
 export default function GroupInfoLayout() {
   const { group: groupId } = useLocalSearchParams<{ group: string }>();
   const { name: groupName } = useLocalSearchParams<{ name: string }>();
+  const { userId: userId } = useLocalSearchParams<{ userId: string }>();
+
 
 
   return (
     <><Stack.Screen
       options={{ title: groupName }} /><MaterialTopTabs id={undefined}>
-        <MaterialTopTabs.Screen name="meetings" options={{ title: "Meetings" }} initialParams={{ groupId }} />
+        <MaterialTopTabs.Screen name="meetings" options={{ title: "Meetings" }} initialParams={{ groupId, userId }} />
         <MaterialTopTabs.Screen name="members" options={{ title: "Members" }} initialParams={{ groupId }} />
         <MaterialTopTabs.Screen name="costs" options={{ title: "Costs" }} initialParams={{ groupId }} />
       </MaterialTopTabs></>

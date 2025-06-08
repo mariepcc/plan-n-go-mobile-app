@@ -1,44 +1,71 @@
-import { Text, View, Alert, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { useEffect, useState } from "react";
+import {
+  Text,
+  View,
+  Alert,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import MeetingCard from "../../../../components/meetings/MeetingCard";
 import MeetingCardCreate from "../../../../components/meetings/CardCreate";
 import { supabase } from "../../../lib/supabase-client";
 import { AntDesign } from "@expo/vector-icons";
+import BottomSheet, {
+  BottomSheetMethods,
+} from "../../../../components/meetings/BottomSheet";
+import BottomSheetPlacesList from "../../../../components/meetings/BottomSheetPlacesList";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function MeetingsTab() {
-  const { groupId } = useLocalSearchParams<{ groupId: string }>();
-  const [user, setUser] = useState(null);
+  const { groupId, userId } = useLocalSearchParams<{ groupId: string, userId: string }>();
   const [meetings, setMeetings] = useState<any[]>([]);
+  const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(
+    null
+  );
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState(new Date());
   const [place, setPlace] = useState<string>("");
 
-  const router = useRouter();
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setUser(user);
-      } else {
-        Alert.alert("Error Accessing User");
-      }
-    });
-  }, []);
+  const bottomSheetRef = useRef<BottomSheetMethods>(null);
+
+  
+  const fetchMeetings = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("meetings")
+      .select(
+        `
+    *,
+    places (
+      id,
+      name,
+      created_by
+    )
+  `
+      )
+      .eq("group_id", groupId)
+      .order("scheduled_at", { ascending: false });
+    console.log("spotkania: ", data);
+
+    if (!error) setMeetings(data || []);
+  }, [groupId]);
 
   useEffect(() => {
-    async function fetchMeetings() {
-      const { data, error } = await supabase
-        .from("meetings")
-        .select("*")
-        .eq("group_id", groupId)
-        .order("created_at", { ascending: false });
-
-      if (!error) setMeetings(data || []);
-    }
-
     fetchMeetings();
   }, [setMeetings]);
+
+
+  const expandSheet = useCallback((meetingId: string) => {
+    setSelectedMeetingId(meetingId);
+    bottomSheetRef.current?.expand();
+  }, []);
+
+  const closeSheet = useCallback(() => {
+    bottomSheetRef.current?.close();
+  }, []);
 
   async function createMeeting() {
     if (!title.trim() || !date) {
@@ -53,7 +80,7 @@ export default function MeetingsTab() {
           group_id: groupId,
           title: title,
           scheduled_at: date,
-          created_by: user.id,
+          created_by: userId,
         },
       ])
       .select();
@@ -76,53 +103,75 @@ export default function MeetingsTab() {
   }
 
   return (
-        <ScrollView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaView>
+          <ScrollView>
+            <View style={{ flex: 1, padding: 16 }}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleAddMeeting}
+              >
+                <View style={styles.iconContainer}>
+                  <AntDesign name="plus" size={16} color="#fff" />
+                </View>
+                <Text style={styles.buttonText}>New Meeting</Text>
+              </TouchableOpacity>
 
-    <View style={{ flex: 1, padding: 16 }}>
-      <TouchableOpacity style={styles.button} onPress={handleAddMeeting}>
-      <View style={styles.iconContainer}>
-        <AntDesign name="plus" size={16} color="#fff" />
-      </View>
-      <Text style={styles.buttonText}>New Meeting</Text>
-    </TouchableOpacity>
+              {isAdding && (
+                <MeetingCardCreate
+                  title={title}
+                  setTitle={setTitle}
+                  date={date}
+                  setDate={setDate}
+                  userId={"some-user-id"}
+                  onSave={createMeeting}
+                />
+              )}
 
-      {isAdding && (
-        <MeetingCardCreate
-          title={title}
-          setTitle={setTitle}
-          date={date}
-          setDate={setDate}
-          userId={"some-user-id"}
-          onSave={createMeeting}
-        />
-      )}
+              {meetings.map((meeting) => (
+                <MeetingCard
+                  key={meeting.id}
+                  title={meeting.title}
+                  date={new Date(meeting.scheduled_at)}
+                  places={meeting.places}
+                  userId={meeting.created_by}
+                  onAddPlace={() => expandSheet(meeting.id)}
+                />
+              ))}
 
-      {meetings.map((meeting) => (
-        <MeetingCard
-          key={meeting.id}
-          title={meeting.title}
-          date={new Date(meeting.scheduled_at)}
-          userId={meeting.created_by}
-        />
-      ))}
-    </View>
-        </ScrollView>
-
+              <BottomSheet
+                ref={bottomSheetRef}
+                snapTo="90%"
+                backgroundColor="white"
+                backDropColor="black"
+              >
+                <BottomSheetPlacesList
+                  meetingId={selectedMeetingId}
+                  userId={userId}
+                  onPlaceAdded={fetchMeetings}
+                  closeSheet={closeSheet}
+                />
+              </BottomSheet>
+            </View>
+          </ScrollView>
+        </SafeAreaView>
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  
   button: {
     marginLeft: 15,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#8FBBBC", 
+    backgroundColor: "#8FBBBC",
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 24,
     alignSelf: "flex-start",
-    marginBottom: 10
+    marginBottom: 10,
   },
   iconContainer: {
     backgroundColor: "#B0CFD0",

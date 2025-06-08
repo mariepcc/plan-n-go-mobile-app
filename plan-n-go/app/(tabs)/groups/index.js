@@ -96,7 +96,7 @@ export default function GroupsPage() {
               <Link
                 href={{
                   pathname: `/groups/${item.id}`,
-                  params: { name: item.name },
+                  params: { name: item.name, userId: user.id },
                 }}
               >
                 <GroupRow title={item.name} />

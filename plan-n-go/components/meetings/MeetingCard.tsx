@@ -9,8 +9,11 @@ import {
   Platform,
   UIManager,
 } from "react-native";
-import React, { useState } from "react";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+
+import React, { useState, useCallback, useRef } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { format } from "date-fns";
 
 if (
@@ -23,11 +26,16 @@ if (
 export default function MeetingCard({
   title,
   date,
+  places,
   userId,
+  onAddPlace,
 }: {
   title: string;
   date: Date;
+  places?: { id: string; name: string }[];
+
   userId: string;
+  onAddPlace: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -57,7 +65,33 @@ export default function MeetingCard({
       {expanded && (
         <>
           <View style={styles.divider} />
-          <Text>Places ideas: </Text>
+          <Text style={styles.placesText}>Places ideas: </Text>
+          {places.length > 0 && (
+            <View style={{ marginTop: 1 }}>
+              {places.length > 0 && (
+                <View style={{ marginTop: 2 }}>
+                  {places.map((place) => (
+                    <Text key={place.id} style={styles.datePreview}>
+                      - {place.name}
+                    </Text>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+          <View style={styles.inputContainer}>
+            <TextInput
+              placeholder="Add a new place idea"
+              style={styles.input}
+              placeholderTextColor="#999"
+              onPress={onAddPlace}
+            />
+            <FontAwesomeIcon
+              icon={faLocationDot}
+              size={18}
+              style={styles.locIcon}
+            />
+          </View>
         </>
       )}
     </View>
@@ -79,6 +113,30 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#d0dce8",
   },
+  inputContainer: {
+    position: "relative",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingLeft: 40,
+    paddingRight: 15,
+    fontSize: 14,
+    backgroundColor: "#e6e6e6",
+  },
+
+  locIcon: {
+    position: "absolute",
+    left: 12,
+    top: "50%",
+    transform: [{ translateY: -10 }],
+    color: "#888",
+  },
   titleHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -88,6 +146,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 4,
+    color: "#7a297a",
+  },
+  placesText: {
+    fontSize: 15,
+    fontWeight: "600",
+    marginBottom: 2,
     color: "#7a297a",
   },
   datePreview: {
@@ -112,7 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   icon: {
-    marginRight: 8,
+    marginLeft: 8,
     color: "#fff",
   },
 });
