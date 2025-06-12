@@ -16,6 +16,7 @@ import BottomSheet, {
   BottomSheetMethods,
 } from "../../../../components/meetings/BottomSheet";
 import BottomSheetPlacesList from "../../../../components/meetings/BottomSheetPlacesList";
+import { BottomSheetVote } from "../../../../components/meetings/BottomSheetVote";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,8 +31,8 @@ export default function MeetingsTab() {
   const [date, setDate] = useState(new Date());
   const [place, setPlace] = useState<string>("");
 
-  const bottomSheetRef = useRef<BottomSheetMethods>(null);
-
+  const bottomSheetPlacesRef = useRef<BottomSheetMethods>(null);
+  const bottomSheetVotesRef = useRef<BottomSheetMethods>(null);
   
   const fetchMeetings = useCallback(async () => {
     const { data, error } = await supabase
@@ -58,13 +59,18 @@ export default function MeetingsTab() {
   }, [setMeetings]);
 
 
-  const expandSheet = useCallback((meetingId: string) => {
+  const expandSheetPlaces = useCallback((meetingId: string) => {
     setSelectedMeetingId(meetingId);
-    bottomSheetRef.current?.expand();
+    bottomSheetPlacesRef.current?.expand();
+  }, []);
+
+  const expandSheetVotes = useCallback((meetingId: string) => {
+    setSelectedMeetingId(meetingId);
+    bottomSheetVotesRef.current?.expand();
   }, []);
 
   const closeSheet = useCallback(() => {
-    bottomSheetRef.current?.close();
+    bottomSheetPlacesRef.current?.close();
   }, []);
 
   async function createMeeting() {
@@ -136,12 +142,13 @@ export default function MeetingsTab() {
                   date={new Date(meeting.scheduled_at)}
                   places={meeting.places}
                   userId={meeting.created_by}
-                  onAddPlace={() => expandSheet(meeting.id)}
+                  onAddPlace={() => expandSheetPlaces(meeting.id)}
+                  onVote={() => expandSheetVotes(meeting.id)}
                 />
               ))}
 
               <BottomSheet
-                ref={bottomSheetRef}
+                ref={bottomSheetPlacesRef}
                 snapTo="90%"
                 backgroundColor="white"
                 backDropColor="black"
@@ -150,6 +157,18 @@ export default function MeetingsTab() {
                   meetingId={selectedMeetingId}
                   userId={userId}
                   onPlaceAdded={fetchMeetings}
+                  closeSheet={closeSheet}
+                />
+              </BottomSheet>
+              <BottomSheet
+                ref={bottomSheetVotesRef}
+                snapTo="70%"
+                backgroundColor="white"
+                backDropColor="black"
+              >
+                <BottomSheetVote
+                  meetingId={selectedMeetingId}
+                  userId={userId}
                   closeSheet={closeSheet}
                 />
               </BottomSheet>

@@ -5,8 +5,8 @@ import {
   View,
   TextInput,
   FlatList,
-  TouchableOpacity,
   StyleSheet,
+  Button,
 } from "react-native";
 import ListItem from "../../../components/ListItem";
 import GroupRow from "../../../components/GroupRow";
@@ -14,6 +14,8 @@ import { Link, useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import * as Notifications from "expo-notifications";
+import { useNotifications } from "../../../hooks/useNotifications";
 
 export default function GroupsPage() {
   const [user, setUser] = useState(null);
@@ -21,11 +23,8 @@ export default function GroupsPage() {
   const [groups, setGroups] = useState([]);
   const navigation = useNavigation();
 
-  const groupsToShow = search
-    ? groups.filter((group) =>
-        group.name.toLowerCase().includes(search.toLowerCase())
-      )
-    : groups;
+  const { scheduleNotificationAsync, cancelNotificationAsync } =
+    useNotifications();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -36,6 +35,18 @@ export default function GroupsPage() {
       }
     });
   }, []);
+
+  const sendNotification = () => {
+    scheduleNotificationAsync({
+      content: {
+        title: "🧪 Test notification!",
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 5,
+      },
+    });
+  };
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("blur", () => {
@@ -58,10 +69,15 @@ export default function GroupsPage() {
           setGroups(data);
         }
       }
-
       groupSearch();
     }, [])
   );
+
+  const filteredGroups = search
+    ? groups.filter((group) =>
+        group.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : groups;
 
   const newGroup = search ? [{ type: "create", name: search }] : [];
 
@@ -81,7 +97,7 @@ export default function GroupsPage() {
               <Text>Time to create new groups!</Text>
             </View>
           }
-          data={[...newGroup, ...groupsToShow]}
+          data={[...newGroup, ...filteredGroups]}
           renderItem={({ item }) =>
             item.type === "create" ? (
               <Link
@@ -105,6 +121,8 @@ export default function GroupsPage() {
           }
         />
       </View>
+      <Button title="Send me a notification" onPress={sendNotification} />
+      <Button title="Cancel notification" onPress={cancelNotificationAsync} />
     </SafeAreaView>
   );
 }

@@ -56,7 +56,7 @@ export default function BottomSheetPlacesList({
     }
 
     onPlaceAdded();
-    setText("");
+    clearInput();
     Keyboard.dismiss();
     closeSheet();
   };

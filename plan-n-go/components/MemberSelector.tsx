@@ -50,8 +50,6 @@ export function MemberSelector({
       } else {
         newSet.add(contactId);
       }
-      console.log("do dodania: ", selectedContacts)
-
       return newSet;
     });
   };

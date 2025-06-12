@@ -29,6 +29,7 @@ export default function MeetingCard({
   places,
   userId,
   onAddPlace,
+  onVote,
 }: {
   title: string;
   date: Date;
@@ -36,6 +37,7 @@ export default function MeetingCard({
 
   userId: string;
   onAddPlace: () => void;
+  onVote: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -92,6 +94,9 @@ export default function MeetingCard({
               style={styles.locIcon}
             />
           </View>
+          <TouchableOpacity style={styles.voteButton} onPress={onVote}>
+            <Text style={styles.voteButtonText}>Vote</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -178,5 +183,21 @@ const styles = StyleSheet.create({
   icon: {
     marginLeft: 8,
     color: "#fff",
+  },
+  voteButton: {
+    marginTop: 15,
+    backgroundColor: "#5A505F",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: 'center'
+  },
+  voteButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+    
+
   },
 });
