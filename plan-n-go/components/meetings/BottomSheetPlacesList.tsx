@@ -63,7 +63,7 @@ export default function BottomSheetPlacesList({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Add a place</Text>
+      <Text style={styles.heading}>Where Should We Go?</Text>
       <View style={styles.inputContainer}>
         <TextInput
           value={text}
@@ -76,13 +76,17 @@ export default function BottomSheetPlacesList({
           <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
             <FontAwesomeIcon
               icon={faCircleXmark}
-              size={24}
+              size={20}
               style={styles.icon}
             />
           </TouchableOpacity>
         )}
       </View>
-      <Button title="Add" onPress={handleAddPlace} />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.addButton} onPress={handleAddPlace}>
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -121,5 +125,26 @@ const styles = StyleSheet.create({
   },
   icon: {
     color: "#999",
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: "center",
+    marginTop: 20,
+  },
+  addButton: {
+    backgroundColor: "#8FBBBC",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+    marginTop: 10,
+  },
+
+  addButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

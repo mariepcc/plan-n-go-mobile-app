@@ -1,7 +1,6 @@
 import {
   Text,
   View,
-  Alert,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -16,12 +15,15 @@ import BottomSheet, {
   BottomSheetMethods,
 } from "../../../../components/meetings/BottomSheet";
 import BottomSheetPlacesList from "../../../../components/meetings/BottomSheetPlacesList";
-import { BottomSheetVote } from "../../../../components/meetings/BottomSheetVote";
+import BottomSheetVote from "../../../../components/meetings/BottomSheetVote";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function MeetingsTab() {
-  const { groupId, userId } = useLocalSearchParams<{ groupId: string, userId: string }>();
+  const { groupId, userId } = useLocalSearchParams<{
+    groupId: string;
+    userId: string;
+  }>();
   const [meetings, setMeetings] = useState<any[]>([]);
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(
     null
@@ -29,11 +31,10 @@ export default function MeetingsTab() {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState(new Date());
-  const [place, setPlace] = useState<string>("");
 
   const bottomSheetPlacesRef = useRef<BottomSheetMethods>(null);
   const bottomSheetVotesRef = useRef<BottomSheetMethods>(null);
-  
+
   const fetchMeetings = useCallback(async () => {
     const { data, error } = await supabase
       .from("meetings")
@@ -57,7 +58,6 @@ export default function MeetingsTab() {
   useEffect(() => {
     fetchMeetings();
   }, [setMeetings]);
-
 
   const expandSheetPlaces = useCallback((meetingId: string) => {
     setSelectedMeetingId(meetingId);
@@ -95,7 +95,6 @@ export default function MeetingsTab() {
       setMeetings([data[0], ...meetings]);
       setIsAdding(false);
       setTitle("");
-      setPlace("");
     } else {
       console.error(error);
       alert("Failed to save meeting");
@@ -104,7 +103,6 @@ export default function MeetingsTab() {
 
   function handleAddMeeting() {
     setTitle("");
-    setPlace("");
     setIsAdding(true);
   }
 
@@ -146,34 +144,30 @@ export default function MeetingsTab() {
                   onVote={() => expandSheetVotes(meeting.id)}
                 />
               ))}
-
-              <BottomSheet
-                ref={bottomSheetPlacesRef}
-                snapTo="90%"
-                backgroundColor="white"
-                backDropColor="black"
-              >
-                <BottomSheetPlacesList
-                  meetingId={selectedMeetingId}
-                  userId={userId}
-                  onPlaceAdded={fetchMeetings}
-                  closeSheet={closeSheet}
-                />
-              </BottomSheet>
-              <BottomSheet
-                ref={bottomSheetVotesRef}
-                snapTo="70%"
-                backgroundColor="white"
-                backDropColor="black"
-              >
-                <BottomSheetVote
-                  meetingId={selectedMeetingId}
-                  userId={userId}
-                  closeSheet={closeSheet}
-                />
-              </BottomSheet>
             </View>
           </ScrollView>
+          <BottomSheet
+            ref={bottomSheetPlacesRef}
+            snapTo="85%"
+            backgroundColor="white"
+            backDropColor="black"
+          >
+            <BottomSheetPlacesList
+              meetingId={selectedMeetingId}
+              userId={userId}
+              onPlaceAdded={fetchMeetings}
+              closeSheet={closeSheet}
+            />
+          </BottomSheet>
+          <BottomSheetVote
+            ref={bottomSheetVotesRef}
+            meetingId={selectedMeetingId}
+            userId={userId}
+            closeSheet={closeSheet}
+            snapTo={"70%"}
+            backgroundColor={"white"}
+            backDropColor={"black"}
+          />
         </SafeAreaView>
       </GestureHandlerRootView>
     </SafeAreaProvider>
@@ -186,15 +180,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#8FBBBC",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 24,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
     alignSelf: "flex-start",
     marginBottom: 10,
+    marginTop: 10,
+
   },
   iconContainer: {
-    backgroundColor: "#B0CFD0",
     borderRadius: 999,
+    borderWidth: 0.5,
+    borderColor: "#fff",
     padding: 6,
     marginRight: 8,
   },

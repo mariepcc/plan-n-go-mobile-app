@@ -82,12 +82,9 @@ export default function MeetingCard({
             </View>
           )}
           <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Add a new place idea"
-              style={styles.input}
-              placeholderTextColor="#999"
-              onPress={onAddPlace}
-            />
+            <Text style={styles.input} onPress={onAddPlace}>
+              Suggest a new spot
+            </Text>
             <FontAwesomeIcon
               icon={faLocationDot}
               size={18}
@@ -133,6 +130,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     fontSize: 14,
     backgroundColor: "#e6e6e6",
+    color: "#666"
   },
 
   locIcon: {
@@ -191,13 +189,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     alignItems: "center",
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   voteButtonText: {
     color: "#fff",
     fontWeight: "600",
     fontSize: 14,
-    
-
   },
 });
