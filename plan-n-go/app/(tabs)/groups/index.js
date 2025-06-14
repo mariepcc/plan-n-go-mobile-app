@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   input: {
-    borderColor: "#000968",
-    borderRadius: 4,
+    borderColor: "#040405",
+    borderRadius: 10,
     borderStyle: "solid",
     borderWidth: 1,
     padding: 12,

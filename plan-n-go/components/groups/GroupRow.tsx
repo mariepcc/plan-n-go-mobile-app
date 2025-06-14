@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   icon: {
-    color: "#B197FC",
+    color: "#2193b0",
     marginRight: 30,
   },
   title: {

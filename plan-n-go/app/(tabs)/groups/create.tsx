@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 16,
+    marginLeft: 10
   },
   inputRow: {
     flexDirection: "row",
@@ -118,15 +119,18 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 6,
+    borderRadius: 10,
     marginRight: 10,
+    marginLeft: 10,
+
   },
   actionContainer: {
-    height: 48,
-    width: 48,
+    height: 43,
+    width: 43,
     backgroundColor: "#e06666",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 6,
+    borderRadius: 10,
+    marginRight: 10
   },
 });

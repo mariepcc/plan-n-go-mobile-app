@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f2f2f2',
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     fontSize: 16,
   },
   listItem: {
@@ -120,9 +120,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    marginLeft: 10,
+    marginRight: 10
+
   },
   iconLeft: {
-    marginRight: 12,
+    marginRight: 20,
+
   },
   textContainer: {
     flex: 1,

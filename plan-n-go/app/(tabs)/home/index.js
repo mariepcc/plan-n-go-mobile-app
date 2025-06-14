@@ -67,6 +67,7 @@ export default function Page() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ headerShown: true, title: "Home" }} />
       <View style={styles.carouselContainer}>
         <Text style={styles.text}>Upcoming meetings:</Text>
         <CustomCardCarousal

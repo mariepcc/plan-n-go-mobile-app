@@ -61,15 +61,15 @@ export default function FriendsIndex() {
 
   async function handleAddContact(profileId) {
     const { error } = await supabase.from("contacts").insert([
-    {
-      user_id: user.id,
-      friend_id: profileId,
-    },
-    {
-      user_id: profileId,
-      friend_id: user.id,
-    },
-  ]);
+      {
+        user_id: user.id,
+        friend_id: profileId,
+      },
+      {
+        user_id: profileId,
+        friend_id: user.id,
+      },
+    ]);
 
     setSearch("");
     setProfiles([]);
@@ -86,8 +86,9 @@ export default function FriendsIndex() {
     await supabase
       .from("contacts")
       .delete()
-      .or(`and(user_id.eq.${user.id},friend_id.eq.${profileId}),and(user_id.eq.${profileId},friend_id.eq.${user.id})`);
-
+      .or(
+        `and(user_id.eq.${user.id},friend_id.eq.${profileId}),and(user_id.eq.${profileId},friend_id.eq.${user.id})`
+      );
 
     loadContacts(user.id);
   }
@@ -164,17 +165,17 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   input: {
+    borderColor: "#040405",
+    borderRadius: 10,
+    borderStyle: "solid",
     borderWidth: 1,
-    borderColor: "#999",
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    fontSize: 16,
+    padding: 12,
+    margin: 8,
   },
   buttonContainer: {
-    backgroundColor: "#23a392",
+    backgroundColor: "#2193b0",
     borderRadius: 10,
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     margin: 8,
   },
