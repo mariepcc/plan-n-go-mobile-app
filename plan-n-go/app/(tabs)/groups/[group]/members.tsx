@@ -3,14 +3,12 @@ import {
   View,
   StyleSheet,
   Alert,
-  TouchableOpacity,
-  TextInput,
   SafeAreaView,
 } from "react-native";
-
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../../lib/supabase-client";
+import MemberRow from "../../../../components/members/MemberRow";
 
 export default function MembersTab() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -34,10 +32,8 @@ export default function MembersTab() {
 
     if (error) {
       console.error("Error fetching group info:", error);
-      console.log("error:", error);
     } else {
       setMembers(data.map((item) => item.username));
-      console.log("Members:", members);
     }
   }
 
@@ -47,7 +43,7 @@ export default function MembersTab() {
       <View style={styles.container}>
         <View style={styles.membersList}>
           {members.map((username) => (
-            <Text key={username}>• {username}</Text>
+            <MemberRow key={username} name={username}></MemberRow>
           ))}
         </View>
       </View>
@@ -59,7 +55,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingTop: 48,
+    paddingTop: 5,
     backgroundColor: "#fff",
   },
   title: {
@@ -72,7 +68,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   membersList: {
-    marginTop: 20,
+    marginTop: 5,
     paddingHorizontal: 16,
   },
   inputRow: {

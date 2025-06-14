@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { supabase } from '../app/lib/supabase-client';
+import { supabase } from '../../app/lib/supabase-client';
 
 export function MemberSelector({
   selectedContacts,

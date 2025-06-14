@@ -26,7 +26,7 @@ export function ProfileRow({
         <Text style={styles.name}>@{item.username}</Text>
       </View>
       <View style={styles.actionContainer}>
-        <FontAwesome name="plus" size={20} color="#ffffff" />
+        <FontAwesome name="user-plus" size={18} color="#ffffff" />
       </View>
     </TouchableOpacity>
   );
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   actionContainer: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     backgroundColor: "#93c47d",
     borderRadius: 6,

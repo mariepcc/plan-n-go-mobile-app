@@ -50,7 +50,6 @@ export default function MeetingsTab() {
       )
       .eq("group_id", groupId)
       .order("scheduled_at", { ascending: false });
-    console.log("spotkania: ", data);
 
     if (!error) setMeetings(data || []);
   }, [groupId]);
@@ -128,7 +127,7 @@ export default function MeetingsTab() {
                   setTitle={setTitle}
                   date={date}
                   setDate={setDate}
-                  userId={"some-user-id"}
+                  userId={userId}
                   onSave={createMeeting}
                 />
               )}

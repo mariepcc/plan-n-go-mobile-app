@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
-import { ContactRow } from "../../../components/ContactRow";
-import { ProfileRow } from "../../../components/ProfileRow";
+import { ContactRow } from "../../../components/friends/ContactRow";
+import { ProfileRow } from "../../../components/friends/ProfileRow";
 import { Stack } from "expo-router";
 
 export default function FriendsIndex() {
@@ -86,7 +86,8 @@ export default function FriendsIndex() {
     await supabase
       .from("contacts")
       .delete()
-      .match({ user_id: user.id, friend_id: profileId });
+      .or(`and(user_id.eq.${user.id},friend_id.eq.${profileId}),and(user_id.eq.${profileId},friend_id.eq.${user.id})`);
+
 
     loadContacts(user.id);
   }

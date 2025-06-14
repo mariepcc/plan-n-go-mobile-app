@@ -8,8 +8,8 @@ import {
   StyleSheet,
   Button,
 } from "react-native";
-import ListItem from "../../../components/ListItem";
-import GroupRow from "../../../components/GroupRow";
+import ListItem from "../../../components/groups/ListItem";
+import GroupRow from "../../../components/groups/GroupRow";
 import { Link, useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { useEffect, useState, useCallback } from "react";

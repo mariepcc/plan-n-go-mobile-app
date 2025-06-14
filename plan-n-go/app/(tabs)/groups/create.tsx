@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
-import { MemberSelector } from "../../../components/MemberSelector";
+import { MemberSelector } from "../../../components/groups/MemberSelector";
 import { uuid } from "../../lib/uuid";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
