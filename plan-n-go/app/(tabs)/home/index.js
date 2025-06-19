@@ -13,15 +13,14 @@ import CustomCardCarousal from "../../../components/home/CustomCardCarousal";
 import { supabase } from "../../lib/supabase-client";
 
 export default function Page() {
-  const [user, setUser] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [upcomingMeetings, setUpcomingMeetings] = useState([]);
   const [pastMeetings, setPastMeetings] = useState([]);
 
   useEffect(() => {
       supabase.auth.getUser().then(({ data: { user } }) => {
         if (user) {
-          setUser(user);
-          loadContacts(user.id);
+          setUserId(user.id);
         } else {
           Alert.alert("Error Accessing User");
         }
@@ -61,7 +60,6 @@ export default function Page() {
 
       setUpcomingMeetings(upcoming);
       setPastMeetings(past);
-      console.log("upcoming: ", upcomingMeetings);
     }
   }
 
@@ -72,6 +70,7 @@ export default function Page() {
         <Text style={styles.text}>Upcoming meetings:</Text>
         <CustomCardCarousal
           data={upcomingMeetings}
+          userId={userId}
           autoPlay={false}
           pagination={true}
         />
@@ -107,6 +106,6 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   carouselContainer: {
-    marginBottom: 20,
+    marginTop:15,
   },
 });

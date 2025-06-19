@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Button,
+  Alert,
 } from "react-native";
 import ListItem from "../../../components/groups/ListItem";
 import GroupRow from "../../../components/groups/GroupRow";
@@ -121,8 +122,6 @@ export default function GroupsPage() {
           }
         />
       </View>
-      <Button title="Send me a notification" onPress={sendNotification} />
-      <Button title="Cancel notification" onPress={cancelNotificationAsync} />
     </SafeAreaView>
   );
 }

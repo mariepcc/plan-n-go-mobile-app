@@ -1,15 +1,13 @@
 import {
-  Button,
   StyleSheet,
   Text,
   View,
   TextInput,
   TouchableOpacity,
-  LayoutAnimation,
 } from "react-native";
 import React, { useState } from "react";
 import DatePicker from "./DatePicker";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function MeetingCardCreate({
   title,
@@ -60,10 +58,10 @@ export default function MeetingCardCreate({
             <Text style={styles.selectedDate}>{date.toDateString()}</Text>
           </View>
         )}
+        <TouchableOpacity style={styles.inlineFab} onPress={onSave}>
+          <Ionicons name="add" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.fab} onPress={onSave}>
-        <Ionicons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
     </View>
   );
 }
@@ -72,24 +70,24 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#E6F0FA",
     borderRadius: 20,
-    padding: 20,
+    padding: 16,
     marginVertical: 10,
     marginHorizontal: 16,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 5,
+    elevation: 2,
     borderWidth: 1,
     borderColor: "#d0dce8",
   },
   titleInput: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 18,
-    marginBottom: 12,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    fontSize: 16,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: "#ccc",
     color: "#333",
@@ -98,44 +96,43 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: "#ccc",
     marginVertical: 6,
-    marginBottom: 20,
+    marginBottom: 16,
     opacity: 0.6,
   },
   dateRow: {
-    borderRadius: 12,
-    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   selectedDateContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#741b47",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     alignSelf: "flex-start",
   },
   selectedDate: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "500",
   },
   icon: {
-    marginRight: 8,
+    marginRight: 6,
   },
-  fab: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    backgroundColor: "#536878",
-    width: 45,
-    height: 45,
-    borderRadius: 28,
+  inlineFab: {
+    backgroundColor: "#5A505F",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
 });

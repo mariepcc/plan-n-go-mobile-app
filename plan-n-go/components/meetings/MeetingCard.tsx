@@ -53,7 +53,7 @@ export default function MeetingCard({
           <Text style={styles.titleText}>{title}</Text>
           <View>
             <Text style={styles.datePreview}>
-              {format(date, "MMMM d, yyyy h:mm a")}
+              {format(date, "MMMM d, yyyy • h:mm a")}
             </Text>
           </View>
         </View>
@@ -74,7 +74,7 @@ export default function MeetingCard({
                 <View style={{ marginTop: 2 }}>
                   {places.map((place) => (
                     <Text key={place.id} style={styles.datePreview}>
-                      - {place.name}
+                      • {place.name}
                     </Text>
                   ))}
                 </View>
@@ -102,7 +102,7 @@ export default function MeetingCard({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#E6F0FA",
+    backgroundColor: "#FEF9E7",
     borderRadius: 20,
     padding: 20,
     marginVertical: 10,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
     borderWidth: 1,
-    borderColor: "#d0dce8",
+    borderColor: "#F9E79F",
   },
   inputContainer: {
     position: "relative",
@@ -132,7 +132,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#e6e6e6",
     color: "#666"
   },
-
   locIcon: {
     position: "absolute",
     left: 12,

@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#8FBBBC",
+    backgroundColor: "#5A505F",
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 20,
@@ -188,15 +188,13 @@ const styles = StyleSheet.create({
 
   },
   iconContainer: {
-    borderRadius: 999,
-    borderWidth: 0.5,
-    borderColor: "#fff",
     padding: 6,
-    marginRight: 8,
+    marginRight: 5,
   },
   buttonText: {
     color: "#fff",
     fontSize: 15,
     fontWeight: "500",
+    marginRight: 8
   },
 });

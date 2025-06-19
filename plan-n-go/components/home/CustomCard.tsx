@@ -5,6 +5,8 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
 } from "react-native-reanimated";
+import { format } from "date-fns";
+
 
 const CustomCard = ({ item, x, index, size, spacer }) => {
   const style = useAnimatedStyle(() => {
@@ -33,7 +35,7 @@ const CustomCard = ({ item, x, index, size, spacer }) => {
         >
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.subtitle}>
-            {item.description || "No description"}
+            {format(item.scheduled_at, "MMMM d, yyyy • h:mm a")}
           </Text>
         </LinearGradient>
       </Animated.View>

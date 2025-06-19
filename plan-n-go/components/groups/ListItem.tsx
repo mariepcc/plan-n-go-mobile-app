@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +16,11 @@ export default function ListItem({ title, subTitle }: Props) {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subTitle}>{subTitle}</Text>
       </View>
-      <FontAwesome name="plus" size={20} color="#666" style={styles.icon} />
+      <Image
+        source={require("../../assets/plus.png")}
+        style={styles.icon}
+        resizeMode="contain"
+      />
     </View>
   );
 }
@@ -28,11 +32,12 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomColor: "#ddd",
     borderBottomWidth: 1,
-    width: "100%"
+    width: "100%",
   },
   icon: {
-    color: "#666",
-    marginRight: 30,
+    width: 30,
+    height: 30,
+    marginRight: 10,
   },
   textContainer: {
     flex: 1,
@@ -40,9 +45,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: "500",
+    marginLeft: 10,
   },
   subTitle: {
     fontSize: 12,
     color: "#666",
+    marginLeft: 10,
   },
 });
