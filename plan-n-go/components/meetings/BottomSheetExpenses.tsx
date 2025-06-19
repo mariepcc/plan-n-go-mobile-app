@@ -9,22 +9,20 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
+  TextInput,
   StyleSheet,
   Dimensions,
-  FlatListProps,
 } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withTiming,
   useAnimatedScrollHandler,
   runOnJS,
-  withTiming,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { supabase } from "../../app/lib/supabase-client";
 import BackDrop from "./BackDrop";
 
@@ -42,15 +40,16 @@ interface Props {
   closeSheet: () => void;
 }
 
-const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
+const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
   (
     { snapTo, backgroundColor, backDropColor, meetingId, userId, closeSheet },
     ref
   ) => {
-    const [places, setPlaces] = useState<any[]>([]);
-    const [votes, setVotes] = useState<Record<string, number>>({});
-    const [votedPlaceId, setVotedPlaceId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [members, setMembers] = useState<any[]>([]);
+    const [expenses, setExpenses] = useState<Record<string, number>>({});
+    const [totalAmount, setTotalAmount] = useState<number>(0);
+    const [divideEvenly, setDivideEvenly] = useState(true);
+
     const scrollBegin = useSharedValue(0);
     const [enableScroll, setEnableScroll] = useState(true);
 
@@ -82,78 +81,60 @@ const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
     );
 
     const animationStyle = useAnimatedStyle(() => {
-      const top = topAnimation.value;
       return {
-        top,
+        top: topAnimation.value,
       };
     });
 
     const fetchData = async () => {
-      const { data: placesData, error: placesError } = await supabase
-        .from("places")
-        .select("id, name")
+      const { data, error } = await supabase
+        .from("meetings_members")
+        .select("user_id, username")
         .eq("meeting_id", meetingId);
 
-      const { data: votesData, error: votesError } = await supabase
-        .from("votes")
-        .select("place_id, user_id, meeting_id");
-
-      if (!placesError && !votesError) {
-        const voteCount = votesData?.reduce((acc, vote) => {
-          acc[vote.place_id] = (acc[vote.place_id] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-
-        const userVote = votesData?.find(
-          (vote) => vote.user_id === userId && vote.meeting_id === meetingId
-        );
-
-        setVotedPlaceId(userVote?.place_id ?? null);
-        setPlaces(placesData || []);
-        setVotes(voteCount || {});
-        setLoading(false);
+      if (error) {
+        console.error("Error fetching group members:", error);
+      } else {
+        setMembers(data);
       }
     };
 
     useEffect(() => {
       fetchData();
+    }, [meetingId]);
 
-      const channel = supabase
-        .channel("realtime-votes")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "votes" },
-          (payload) => {
-            runOnJS(fetchData)();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }, [votedPlaceId, meetingId]);
-
-    const handleVote = async (placeId: string) => {
-      if (placeId === votedPlaceId) {
-        await supabase
-          .from("votes")
-          .delete()
-          .eq("user_id", userId)
-          .eq("place_id", placeId);
-        setVotedPlaceId(null);
-      } else {
-        await supabase
-          .from("votes")
-          .delete()
-          .eq("user_id", userId)
-          .eq("meeting_id", meetingId);
-        await supabase.from("votes").insert({
-          user_id: userId,
-          place_id: placeId,
-          meeting_id: meetingId,
+    useEffect(() => {
+      if (divideEvenly && members.length > 0) {
+        const evenAmount = totalAmount / members.length;
+        const newExpenses: Record<string, number> = {};
+        members.forEach((member) => {
+          newExpenses[member.user_id] = parseFloat(evenAmount.toFixed(2));
         });
-        setVotedPlaceId(placeId);
+        setExpenses(newExpenses);
+      }
+    }, [divideEvenly, totalAmount, members]);
+
+    const handleSaveExpenses = async () => {
+      try {
+        const updates = Object.entries(expenses).map(([userId, amount]) => ({
+          meeting_id: meetingId,
+          user_id: userId,
+          amount: amount || 0,
+          is_returned: false,
+        }));
+
+        const { error } = await supabase
+          .from("expenses")
+          .upsert(updates);
+
+        if (error) {
+          console.error("Error saving expenses:", error);
+        } else {
+          console.log("Expenses saved!");
+          closeSheet();
+        }
+      } catch (err) {
+        console.error("Unexpected error saving expenses:", err);
       }
     };
 
@@ -210,29 +191,17 @@ const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
         } else if (event.translationY > 0 && scrollY.value === 0) {
           runOnJS(setEnableScroll)(false);
           topAnimation.value = withSpring(
-            Math.max(
-              context.value + event.translationY - scrollBegin.value,
-              openHeight
-            ),
-            {
-              damping: 100,
-              stiffness: 400,
-            }
+            Math.max(context.value + event.translationY - scrollBegin.value, openHeight),
+            { damping: 100, stiffness: 400 }
           );
         }
       })
       .onEnd(() => {
         runOnJS(setEnableScroll)(true);
         if (topAnimation.value > openHeight + 50) {
-          topAnimation.value = withSpring(closeHeight, {
-            damping: 100,
-            stiffness: 400,
-          });
+          topAnimation.value = withSpring(closeHeight, { damping: 100, stiffness: 400 });
         } else {
-          topAnimation.value = withSpring(openHeight, {
-            damping: 100,
-            stiffness: 400,
-          });
+          topAnimation.value = withSpring(openHeight, { damping: 100, stiffness: 400 });
         }
       });
 
@@ -247,57 +216,93 @@ const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
           openHeight={openHeight}
           close={close}
         />
-        <GestureDetector
-          gesture={Gesture.Simultaneous(panScroll, scrollViewGesture)}
-        >
+        <GestureDetector gesture={Gesture.Simultaneous(panScroll, scrollViewGesture)}>
           <Animated.View
             style={[styles.sheet, animationStyle, { backgroundColor }]}
           >
             <View style={styles.handleContainer}>
               <View style={styles.handle} />
             </View>
-            <Text style={styles.title}>Choose your favorite spot!</Text>
+
+            <Text style={styles.title}>Manage Expenses</Text>
+
+            <View style={styles.totalInputContainer}>
+              <Text style={{ marginBottom: 6 }}>Total Amount (€)</Text>
+              <TextInput
+                keyboardType="numeric"
+                placeholder="Enter total amount"
+                value={totalAmount.toString()}
+                onChangeText={(text) => {
+                  const value = parseFloat(text) || 0;
+                  setTotalAmount(value);
+                }}
+                style={styles.totalInput}
+              />
+            </View>
+
+            <View style={styles.toggleContainer}>
+              <TouchableOpacity
+                onPress={() => setDivideEvenly(true)}
+                style={[
+                  styles.toggleButton,
+                  divideEvenly && styles.toggleButtonActive,
+                ]}
+              >
+                <Text style={styles.toggleButtonText}>Divide Evenly</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setDivideEvenly(false)}
+                style={[
+                  styles.toggleButton,
+                  !divideEvenly && styles.toggleButtonActive,
+                ]}
+              >
+                <Text style={styles.toggleButtonText}>Custom</Text>
+              </TouchableOpacity>
+            </View>
+
             <Animated.FlatList
               scrollEventThrottle={16}
               onScroll={onScroll}
               scrollEnabled={enableScroll}
-              data={places}
-              keyExtractor={(item) => item.id}
+              data={members}
+              keyExtractor={(item) => item.user_id}
               contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
               ListEmptyComponent={
                 <Text style={{ textAlign: "center", marginTop: 20 }}>
-                  No places found.
+                  No members found.
                 </Text>
               }
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.listItem}
-                  onPress={() => handleVote(item.id)}
-                >
-                  <View style={styles.iconLeft}>
-                    <FontAwesome name="map-marker" size={20} />
-                  </View>
-                  <View style={styles.textContainer}>
-                    <Text style={styles.name}>{item.name}</Text>
-                    <Text style={styles.voteCount}>
-                      {votes[item.id] || 0} vote
-                      {(votes[item.id] || 0) !== 1 ? "s" : ""}
-                    </Text>
-                  </View>
-                  <View style={styles.iconRight}>
-                    {votedPlaceId === item.id ? (
-                      <FontAwesome
-                        name="check-circle"
-                        size={20}
-                        color="#007AFF"
-                      />
-                    ) : (
-                      <FontAwesome name="circle-thin" size={20} />
-                    )}
-                  </View>
-                </TouchableOpacity>
+                <View style={styles.listItem}>
+                  <Text style={styles.name}>{item.username}</Text>
+                  <TextInput
+                    keyboardType="numeric"
+                    style={styles.memberInput}
+                    value={expenses[item.user_id]?.toString() || ''}
+                    onChangeText={(text) => {
+                      const value = parseFloat(text);
+                      setExpenses((prev) => ({ ...prev, [item.user_id]: value }));
+                    }}
+                    editable={!divideEvenly}
+                  />
+                </View>
               )}
             />
+
+            <TouchableOpacity
+              onPress={handleSaveExpenses}
+              style={{
+                margin: 20,
+                padding: 16,
+                backgroundColor: "#5A505F",
+                borderRadius: 12,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>
+                Save Expenses
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
         </GestureDetector>
       </>
@@ -305,7 +310,7 @@ const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
   }
 );
 
-export default BottomSheetVote;
+export default BottomSheetExpenses;
 
 const styles = StyleSheet.create({
   sheet: {
@@ -327,10 +332,41 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#7a297a",
+    color: "#5A505F",
     textAlign: "center",
     marginBottom: 16,
     marginTop: 10,
+  },
+  totalInputContainer: {
+    marginHorizontal: 20,
+    marginBottom: 16,
+  },
+  totalInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  toggleButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    backgroundColor: "#ccc",
+    marginHorizontal: 5,
+  },
+  toggleButtonActive: {
+    backgroundColor: "#5A505F",
+  },
+  toggleButtonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
   listItem: {
     flexDirection: "row",
@@ -340,22 +376,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  iconLeft: {
-    marginRight: 12,
-  },
-  textContainer: {
-    flex: 1,
-  },
   name: {
+    flex: 1,
     fontSize: 16,
     fontWeight: "500",
   },
-  voteCount: {
-    fontSize: 14,
-    color: "#999",
-    marginTop: 2,
-  },
-  iconRight: {
-    marginLeft: 12,
+  memberInput: {
+    width: 80,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    textAlign: "right",
   },
 });

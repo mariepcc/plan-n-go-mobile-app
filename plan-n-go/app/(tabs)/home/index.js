@@ -25,7 +25,7 @@ export default function Page() {
           Alert.alert("Error Accessing User");
         }
       });
-    }, []);
+    }, [userId]);
 
   useFocusEffect(
     useCallback(() => {
@@ -79,6 +79,7 @@ export default function Page() {
         <Text style={styles.text}>Past meetings:</Text>
         <CustomCardCarousal
           data={pastMeetings}
+          userId={userId}
           autoPlay={false}
           pagination={true}
         />

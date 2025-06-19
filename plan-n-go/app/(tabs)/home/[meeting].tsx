@@ -17,6 +17,7 @@ import BottomSheet, {
 } from "../../../components/meetings/BottomSheet";
 import BottomSheetVote from "../../../components/meetings/BottomSheetVote";
 import BottomSheetPlacesList from "../../../components/meetings/BottomSheetPlacesList";
+import BottomSheetExpenses from "../../../components/meetings/BottomSheetExpenses";
 
 export default function MeetingPage() {
   const {
@@ -33,6 +34,8 @@ export default function MeetingPage() {
 
   const bottomSheetPlacesRef = useRef<BottomSheetMethods>(null);
   const bottomSheetVotesRef = useRef<BottomSheetMethods>(null);
+const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
+
 
   const expandSheetPlaces = useCallback(() => {
     bottomSheetPlacesRef.current?.expand();
@@ -40,6 +43,9 @@ export default function MeetingPage() {
 
   const expandSheetVotes = useCallback(() => {
     bottomSheetVotesRef.current?.expand();
+  }, []);
+  const expandSheetExpenses = useCallback(() => {
+    bottomSheetExpensesRef.current?.expand();
   }, []);
 
   const closeSheet = useCallback(() => {
@@ -119,6 +125,7 @@ export default function MeetingPage() {
         <FloatingPoint
           onVote={expandSheetVotes}
           onAddSpot={expandSheetPlaces}
+          onAddExpense={expandSheetExpenses}
         />
         <BottomSheet
           ref={bottomSheetPlacesRef}
@@ -139,6 +146,15 @@ export default function MeetingPage() {
           userId={userId}
           closeSheet={closeSheet}
           snapTo={"70%"}
+          backgroundColor={"white"}
+          backDropColor={"black"}
+        />
+        <BottomSheetExpenses
+        ref={bottomSheetExpensesRef}
+          meetingId={meetingId}
+          userId={userId}
+          closeSheet={closeSheet}
+          snapTo={"90%"}
           backgroundColor={"white"}
           backDropColor={"black"}
         />

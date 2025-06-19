@@ -56,7 +56,6 @@ export default function FriendsIndex() {
         type: "contact",
       })) ?? []
     );
-    console.log("Contacts data:", error);
   }
 
   async function handleAddContact(profileId) {
@@ -111,9 +110,6 @@ export default function FriendsIndex() {
 
     setProfiles(filtered ?? []);
     setNoResults(filtered.length === 0);
-    console.log("search text:", search);
-
-    console.log("filtered:", error);
   }
 
   return (

@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-const FloatingPoint = ({ onVote, onAddSpot }) => {
+const FloatingPoint = ({ onVote, onAddSpot, onAddExpense }) => {
   const firstValue = useSharedValue(30);
   const secondValue = useSharedValue(30);
   const thirdValue = useSharedValue(30);
@@ -159,7 +159,7 @@ const FloatingPoint = ({ onVote, onAddSpot }) => {
           <Animated.Text style={[styles.text, opacityText]}>Vote</Animated.Text>
         </Animated.View>
       </Pressable>
-      <Pressable onPress={onVote}>
+      <Pressable onPress={onAddExpense}>
       <Animated.View
         style={[styles.contentContainer, firstIcon, firstWidthStyle]}
       >
