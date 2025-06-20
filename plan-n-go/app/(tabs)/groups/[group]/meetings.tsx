@@ -31,6 +31,7 @@ export default function MeetingsTab() {
   const [isAdding, setIsAdding] = useState(false);
   const [title, setTitle] = useState<string>("");
   const [date, setDate] = useState(new Date());
+  const [placesRefreshCounter, setPlacesRefreshCounter] = useState(0);
 
   const bottomSheetPlacesRef = useRef<BottomSheetMethods>(null);
   const bottomSheetVotesRef = useRef<BottomSheetMethods>(null);
@@ -51,7 +52,10 @@ export default function MeetingsTab() {
       .eq("group_id", groupId)
       .order("scheduled_at", { ascending: false });
 
-    if (!error) setMeetings(data || []);
+    if (!error) {
+      setMeetings(data || []);
+      setPlacesRefreshCounter((prev) => prev + 1);
+    }
   }, [groupId]);
 
   useEffect(() => {
@@ -109,7 +113,7 @@ export default function MeetingsTab() {
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaView>
-          <ScrollView>
+          <ScrollView contentContainerStyle={{ paddingBottom: 300 }}>
             <View style={{ flex: 1, padding: 16 }}>
               <TouchableOpacity
                 style={styles.button}
@@ -143,7 +147,8 @@ export default function MeetingsTab() {
                   onVote={() => expandSheetVotes(meeting.id)}
                 />
               ))}
-            </View>
+                                    </View>
+
           </ScrollView>
           <BottomSheet
             ref={bottomSheetPlacesRef}
@@ -162,11 +167,13 @@ export default function MeetingsTab() {
             ref={bottomSheetVotesRef}
             meetingId={selectedMeetingId}
             userId={userId}
+            refreshPlacesCounter={placesRefreshCounter}
             closeSheet={closeSheet}
             snapTo={"70%"}
             backgroundColor={"white"}
             backDropColor={"black"}
           />
+
         </SafeAreaView>
       </GestureHandlerRootView>
     </SafeAreaProvider>
@@ -185,7 +192,6 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginBottom: 10,
     marginTop: 10,
-
   },
   iconContainer: {
     padding: 6,
@@ -195,6 +201,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 15,
     fontWeight: "500",
-    marginRight: 8
+    marginRight: 8,
   },
 });

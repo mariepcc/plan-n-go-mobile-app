@@ -31,11 +31,11 @@ export default function MeetingPage() {
   }>();
   const [places, setPlaces] = useState([]);
   const [date, setDate] = useState(Date);
+  const [placesRefreshCounter, setPlacesRefreshCounter] = useState(0);
 
   const bottomSheetPlacesRef = useRef<BottomSheetMethods>(null);
   const bottomSheetVotesRef = useRef<BottomSheetMethods>(null);
-const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
-
+  const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
 
   const expandSheetPlaces = useCallback(() => {
     bottomSheetPlacesRef.current?.expand();
@@ -55,7 +55,7 @@ const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
   useFocusEffect(
     useCallback(() => {
       fetchMeetings();
-    }, [[meetingId]])
+    }, [meetingId])
   );
 
   async function fetchMeetings() {
@@ -77,6 +77,7 @@ const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
     if (!error && data) {
       setPlaces(data.places ?? []);
       setDate(data.scheduled_at);
+      setPlacesRefreshCounter((prev) => prev + 1);
     } else {
       console.error("Error fetching meeting:", error);
     }
@@ -145,12 +146,13 @@ const bottomSheetExpensesRef = useRef<BottomSheetMethods>(null);
           meetingId={meetingId}
           userId={userId}
           closeSheet={closeSheet}
+          refreshPlacesCounter={placesRefreshCounter}
           snapTo={"70%"}
           backgroundColor={"white"}
           backDropColor={"black"}
         />
         <BottomSheetExpenses
-        ref={bottomSheetExpensesRef}
+          ref={bottomSheetExpensesRef}
           meetingId={meetingId}
           userId={userId}
           closeSheet={closeSheet}
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
-    marginTop: 8
+    marginTop: 8,
   },
   cardRow: {
     flexDirection: "row",

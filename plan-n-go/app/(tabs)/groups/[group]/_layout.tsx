@@ -29,7 +29,7 @@ export default function GroupInfoLayout() {
       options={{ title: groupName }} /><MaterialTopTabs id={undefined}>
         <MaterialTopTabs.Screen name="meetings" options={{ title: "Meetings" }} initialParams={{ groupId, userId }} />
         <MaterialTopTabs.Screen name="members" options={{ title: "Members" }} initialParams={{ groupId }} />
-        <MaterialTopTabs.Screen name="costs" options={{ title: "Costs" }} initialParams={{ groupId }} />
+        <MaterialTopTabs.Screen name="costs" options={{ title: "Expenses" }} initialParams={{ groupId, userId }} />
       </MaterialTopTabs></>
   );
 }

@@ -87,15 +87,39 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
     });
 
     const fetchData = async () => {
-      const { data, error } = await supabase
+      const { data: members, error: membersError } = await supabase
         .from("meetings_members")
         .select("user_id, username")
         .eq("meeting_id", meetingId);
 
-      if (error) {
-        console.error("Error fetching group members:", error);
-      } else {
-        setMembers(data);
+      const { data: expensesData, error: expensesError } = await supabase
+        .from("expenses")
+        .select("*")
+        .eq("meeting_id", meetingId);
+
+      if (membersError) {
+        console.error("Error fetching group members:", membersError);
+      }
+      if (expensesError) {
+        console.error("Error fetching group expenses:", expensesError);
+      }
+
+      if (members) {
+        setMembers(members);
+      }
+
+      if (expensesData) {
+        const expensesMap: Record<string, number> = {};
+        let total = 0;
+
+        expensesData.forEach((item) => {
+          expensesMap[item.user_id] = item.amount;
+          total += item.amount;
+        });
+
+        setExpenses(expensesMap);
+        setTotalAmount(total);
+        setDivideEvenly(false);
       }
     };
 
@@ -115,26 +139,64 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
     }, [divideEvenly, totalAmount, members]);
 
     const handleSaveExpenses = async () => {
-      try {
-        const updates = Object.entries(expenses).map(([userId, amount]) => ({
-          meeting_id: meetingId,
-          user_id: userId,
-          amount: amount || 0,
-          is_returned: false,
-        }));
+      const { data: existingExpenses, error: fetchError } = await supabase
+        .from("expenses")
+        .select("user_id, amount")
+        .eq("meeting_id", meetingId);
 
-        const { error } = await supabase
-          .from("expenses")
-          .upsert(updates);
+      if (fetchError) {
+        console.error("Error fetching existing expenses:", fetchError);
+        return;
+      }
 
-        if (error) {
-          console.error("Error saving expenses:", error);
+      const updates = [];
+      const inserts = [];
+
+      members.forEach((member) => {
+        const touchedAmount = expenses[member.user_id];
+
+        if (touchedAmount === undefined || touchedAmount === 0) return;
+
+        const existing = existingExpenses?.find(
+          (e) => e.user_id === member.user_id
+        );
+
+        if (existing) {
+          updates.push({
+            user_id: member.user_id,
+            amount: touchedAmount,
+            meeting_id: meetingId,
+          });
         } else {
-          console.log("Expenses saved!");
-          closeSheet();
+          inserts.push({
+            user_id: member.user_id,
+            amount: touchedAmount,
+            is_returned: false,
+            meeting_id: meetingId,
+          });
         }
-      } catch (err) {
-        console.error("Unexpected error saving expenses:", err);
+      });
+
+      if (updates.length > 0) {
+        const updateResults = await Promise.allSettled(
+          updates.map((update) =>
+            supabase
+              .from("expenses")
+              .update({ amount: update.amount })
+              .eq("meeting_id", update.meeting_id)
+              .eq("user_id", update.user_id)
+          )
+        );
+      }
+
+      if (inserts.length > 0) {
+        const { data: insertData, error: insertError } = await supabase
+          .from("expenses")
+          .insert(inserts);
+
+        if (insertError) {
+          console.error("Error inserting expenses:", insertError);
+        }
       }
     };
 
@@ -191,7 +253,10 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
         } else if (event.translationY > 0 && scrollY.value === 0) {
           runOnJS(setEnableScroll)(false);
           topAnimation.value = withSpring(
-            Math.max(context.value + event.translationY - scrollBegin.value, openHeight),
+            Math.max(
+              context.value + event.translationY - scrollBegin.value,
+              openHeight
+            ),
             { damping: 100, stiffness: 400 }
           );
         }
@@ -199,9 +264,15 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
       .onEnd(() => {
         runOnJS(setEnableScroll)(true);
         if (topAnimation.value > openHeight + 50) {
-          topAnimation.value = withSpring(closeHeight, { damping: 100, stiffness: 400 });
+          topAnimation.value = withSpring(closeHeight, {
+            damping: 100,
+            stiffness: 400,
+          });
         } else {
-          topAnimation.value = withSpring(openHeight, { damping: 100, stiffness: 400 });
+          topAnimation.value = withSpring(openHeight, {
+            damping: 100,
+            stiffness: 400,
+          });
         }
       });
 
@@ -216,7 +287,9 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
           openHeight={openHeight}
           close={close}
         />
-        <GestureDetector gesture={Gesture.Simultaneous(panScroll, scrollViewGesture)}>
+        <GestureDetector
+          gesture={Gesture.Simultaneous(panScroll, scrollViewGesture)}
+        >
           <Animated.View
             style={[styles.sheet, animationStyle, { backgroundColor }]}
           >
@@ -227,7 +300,7 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
             <Text style={styles.title}>Manage Expenses</Text>
 
             <View style={styles.totalInputContainer}>
-              <Text style={{ marginBottom: 6 }}>Total Amount (€)</Text>
+              <Text style={{ marginBottom: 6 }}>Total Amount (zł)</Text>
               <TextInput
                 keyboardType="numeric"
                 placeholder="Enter total amount"
@@ -279,10 +352,13 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
                   <TextInput
                     keyboardType="numeric"
                     style={styles.memberInput}
-                    value={expenses[item.user_id]?.toString() || ''}
+                    value={expenses[item.user_id]?.toString() || ""}
                     onChangeText={(text) => {
                       const value = parseFloat(text);
-                      setExpenses((prev) => ({ ...prev, [item.user_id]: value }));
+                      setExpenses((prev) => ({
+                        ...prev,
+                        [item.user_id]: value,
+                      }));
                     }}
                     editable={!divideEvenly}
                   />
@@ -299,7 +375,13 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
                 borderRadius: 12,
               }}
             >
-              <Text style={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>
+              <Text
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                }}
+              >
                 Save Expenses
               </Text>
             </TouchableOpacity>

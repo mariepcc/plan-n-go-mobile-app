@@ -39,12 +39,21 @@ interface Props {
   backDropColor: string;
   meetingId: string;
   userId: string;
+  refreshPlacesCounter: number;
   closeSheet: () => void;
 }
 
 const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
   (
-    { snapTo, backgroundColor, backDropColor, meetingId, userId, closeSheet },
+    {
+      snapTo,
+      backgroundColor,
+      backDropColor,
+      meetingId,
+      userId,
+      refreshPlacesCounter,
+      closeSheet,
+    },
     ref
   ) => {
     const [places, setPlaces] = useState<any[]>([]);
@@ -132,7 +141,7 @@ const BottomSheetVote = forwardRef<BottomSheetMethods, Props>(
       return () => {
         supabase.removeChannel(channel);
       };
-    }, [votedPlaceId, meetingId]);
+    }, [refreshPlacesCounter, votedPlaceId, meetingId]);
 
     const handleVote = async (placeId: string) => {
       if (placeId === votedPlaceId) {

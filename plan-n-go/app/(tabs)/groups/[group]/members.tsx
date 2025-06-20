@@ -8,7 +8,7 @@ import {
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../../lib/supabase-client";
-import MemberRow from "../../../../components/members/MemberRow";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function MembersTab() {
   const { groupId } = useLocalSearchParams<{ groupId: string }>();
@@ -42,7 +42,10 @@ export default function MembersTab() {
       <View style={styles.container}>
         <View style={styles.membersList}>
           {members.map((username) => (
-            <MemberRow key={username} name={username}></MemberRow>
+            <View key={username} style={styles.card}>
+              <FontAwesome name="user-circle" size={24} color="#333" style={{ marginRight: 10 }} />
+              <Text style={styles.cardText}>{username}</Text>
+            </View>
           ))}
         </View>
       </View>
@@ -54,42 +57,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingTop: 5,
     backgroundColor: "#fff",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 12,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
+    marginBottom: 16,
   },
   membersList: {
-    marginTop: 5,
-    paddingHorizontal: 16,
+    flexDirection: "column",
+    gap: 12,
   },
-  inputRow: {
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 20,
+    padding: 16,
+    marginVertical: 10,
+    marginHorizontal: 16,
+    marginTop: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  input: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    marginRight: 10,
-  },
-  actionContainer: {
-    height: 48,
-    width: 48,
-    backgroundColor: "#e06666",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 6,
+  cardText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
