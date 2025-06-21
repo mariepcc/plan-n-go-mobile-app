@@ -173,6 +173,7 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
             amount: touchedAmount,
             is_returned: false,
             meeting_id: meetingId,
+            created_by: userId,
           });
         }
       });
@@ -198,6 +199,7 @@ const BottomSheetExpenses = forwardRef<BottomSheetMethods, Props>(
           console.error("Error inserting expenses:", insertError);
         }
       }
+      closeSheet();
     };
 
     const pan = Gesture.Pan()

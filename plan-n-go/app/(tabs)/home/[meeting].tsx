@@ -52,6 +52,10 @@ export default function MeetingPage() {
     bottomSheetPlacesRef.current?.close();
   }, []);
 
+  const closeExpenseSheet = useCallback(() => {
+    bottomSheetExpensesRef.current?.close();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       fetchMeetings();
@@ -155,7 +159,7 @@ export default function MeetingPage() {
           ref={bottomSheetExpensesRef}
           meetingId={meetingId}
           userId={userId}
-          closeSheet={closeSheet}
+          closeSheet={closeExpenseSheet}
           snapTo={"90%"}
           backgroundColor={"white"}
           backDropColor={"black"}

@@ -3,15 +3,15 @@ import {
   Text,
   View,
   StyleSheet,
-  ScrollView,
-  SafeAreaView,
+  LayoutAnimation,
+  TouchableOpacity,
 } from "react-native";
 import { supabase } from "../../../lib/supabase-client";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 
 export default function CostsTab() {
   const { groupId, userId } = useLocalSearchParams<{
@@ -20,25 +20,60 @@ export default function CostsTab() {
   }>();
 
   const [expenses, setExpenses] = useState<any[]>([]);
+  const [expandedExpenseId, setExpandedExpenseId] = useState<string | null>(
+    null
+  );
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(
+    new Set()
+  );
 
-  const fetchMeetings = useCallback(async () => {
+  const fetchExpenses = useCallback(async () => {
     const { data, error } = await supabase
       .from("group_expenses")
       .select("*")
-      .eq("group_id", groupId)
-      .eq("user_id", userId);
+      .eq("group_id", groupId);
 
     if (error) {
-      console.error("Error fetching existing expenses:", error);
-      return;
-    } else {
+      console.error("Error fetching expenses:", error);
+    } else if (data) {
       setExpenses(data);
+
+      // Initialize selectedMembers based on who already returned money
+      const returnedUserIds = new Set(
+        data
+          .filter((expense) => expense.is_returned)
+          .map((expense) => expense.user_id)
+      );
+      setSelectedMembers(returnedUserIds);
     }
   }, [groupId]);
 
+  const toggleExpand = (expenseId: string) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpandedExpenseId((prevId) => (prevId === expenseId ? null : expenseId));
+  };
+
+  const toggleReturnedStatus = async (
+    userIdToUpdate: string,
+    expenseId: string,
+    currentIsReturned: boolean
+  ) => {
+    const { error } = await supabase
+      .from("expenses")
+      .update({ is_returned: !currentIsReturned })
+      .eq("user_id", userIdToUpdate)
+      .eq("id", expenseId);
+
+    if (error) {
+      console.error("Failed to update is_returned status:", error);
+    } else {
+      fetchExpenses(); // Refresh expenses after update
+    }
+  };
+
   useEffect(() => {
-    fetchMeetings();
-  }, [setExpenses]);
+    fetchExpenses();
+  }, [groupId]);
 
   return (
     <SafeAreaProvider>
@@ -47,31 +82,106 @@ export default function CostsTab() {
           <Text style={styles.emptyText}>No expenses found.</Text>
         ) : (
           <FlatList
-            data={expenses}
-            keyExtractor={(item) => item.id}
+            data={expenses.filter((item) => item.user_id === userId)}
+            keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.listContent}
-            renderItem={({ item }) => (
-              <LinearGradient
-                colors={["#ffecd2", "#fcb69f"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.card}
-              >
-                <Text style={styles.cardTitle}>{item.meeting_title}</Text>
-                <Text style={styles.cardAmount}>
-                  Amount:{" "}
-                  <Text style={styles.cardAmountValue}>{item.amount} zł</Text>
-                </Text>
-                <Text
-                  style={[
-                    styles.cardStatus,
-                    { color: item.is_returned ? "green" : "red" },
-                  ]}
+            renderItem={({ item }) => {
+              const isCreatedByMe = item.created_by === userId;
+              const isExpanded = expandedExpenseId === item.id;
+
+              return (
+                <TouchableOpacity
+                  activeOpacity={isCreatedByMe ? 0.8 : 1}
+                  onPress={() => {
+                    if (isCreatedByMe) {
+                      toggleExpand(item.id);
+                    }
+                  }}
                 >
-                  {item.is_returned ? "Returned" : "Not Returned"}
-                </Text>
-              </LinearGradient>
-            )}
+                  <LinearGradient
+                    colors={["#fffefa", "#ffe8a3"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.card}
+                  >
+                    <Text style={styles.cardTitle}>{item.meeting_title}</Text>
+                    <Text style={styles.cardAmount}>
+                      You spent:{" "}
+                      <Text style={styles.cardAmountValue}>
+                        {item.amount} zł
+                      </Text>
+                    </Text>
+                    {!isCreatedByMe && (
+                      <Text
+                        style={[
+                          styles.cardStatus,
+                          { color: item.is_returned ? "#13690D" : "#A21212" },
+                        ]}
+                      >
+                        {item.is_returned ? "Returned" : "Not Returned"}
+                      </Text>
+                    )}
+
+                    {isCreatedByMe && (
+                      <Ionicons
+                        name={isExpanded ? "chevron-up" : "chevron-down"}
+                        size={22}
+                        color="#7a297a"
+                        style={styles.expandIcon}
+                      />
+                    )}
+
+                    {isCreatedByMe && isExpanded && (
+                      <>
+                        <Text>Who owes you: </Text>
+                        <FlatList
+                          data={expenses.filter(
+                            (expense) =>
+                              expense.created_by === userId &&
+                              expense.user_id !== userId &&
+                              expense.meeting_title === item.meeting_title
+                          )}
+                          keyExtractor={(expense) => expense.id}
+                          renderItem={({ item: expenseItem }) => (
+                            <TouchableOpacity
+                              style={styles.listItem}
+                              onPress={() =>
+                                toggleReturnedStatus(
+                                  expenseItem.user_id,
+                                  expenseItem.id,
+                                  expenseItem.is_returned
+                                )
+                              }
+                            >
+                              <View style={styles.iconLeft}>
+                                <FontAwesome name="user" size={20} />
+                              </View>
+                              <View style={styles.textContainer}>
+                                <Text style={styles.name}>
+                                  {expenseItem.username} : {expenseItem.amount}{" "}
+                                  zł
+                                </Text>
+                              </View>
+                              <View style={styles.iconRight}>
+                                {expenseItem.is_returned ? (
+                                  <FontAwesome
+                                    name="check-circle"
+                                    size={20}
+                                    color="#007AFF"
+                                  />
+                                ) : (
+                                  <FontAwesome name="circle-thin" size={20} />
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                          )}
+                        />
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              );
+            }}
           />
         )}
       </View>
@@ -85,11 +195,6 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
   },
-  header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
   emptyText: {
     fontSize: 16,
     color: "#888",
@@ -100,21 +205,25 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 16,
-    marginBottom: 25,
-    marginVertical: 10,
-    marginHorizontal: 16,
+    marginBottom: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    borderColor: "#FAD0B9",
-    borderWidth: 1
+    borderColor: "#ffe8a3",
+    borderWidth: 0.5,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
+  },
+  expandIcon: {
+    position: "absolute",
+    top: 15,
+    right: 15,
+    zIndex: 1,
   },
   cardAmount: {
     fontSize: 15,
@@ -126,5 +235,28 @@ const styles = StyleSheet.create({
   cardStatus: {
     fontSize: 14,
     marginTop: 5,
+  },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  iconLeft: {
+    marginRight: 20,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  iconRight: {
+    marginLeft: 12,
   },
 });
