@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase-client";
 import {
-  SafeAreaView,
   StyleSheet,
   View,
   Alert,
@@ -11,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Stack } from "expo-router";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function Account() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +107,7 @@ export default function Account() {
           <Text style={styles.label}>Username</Text>
           <TextInput
             style={styles.input}
-            value={username} 
+            value={username}
             onChangeText={setUsername}
             editable={!loading}
             placeholder={username ?? ""}

@@ -10,7 +10,7 @@ import {
   UIManager,
 } from "react-native";
 
-import React, { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     fontSize: 14,
     backgroundColor: "#e6e6e6",
-    color: "#666"
+    color: "#666",
   },
   locIcon: {
     position: "absolute",

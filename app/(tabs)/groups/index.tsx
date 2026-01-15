@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
 import {
-  SafeAreaView,
   Text,
   View,
   TextInput,
@@ -9,6 +8,7 @@ import {
   Button,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ListItem from "../../../components/groups/ListItem";
 import GroupRow from "../../../components/groups/GroupRow";
 import { Link, useNavigation } from "expo-router";

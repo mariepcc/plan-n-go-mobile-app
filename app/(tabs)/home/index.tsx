@@ -1,14 +1,14 @@
 import { Stack } from "expo-router";
 import {
   StyleSheet,
-  SafeAreaView,
   Platform,
   StatusBar,
   View,
   Text,
   Alert,
 } from "react-native";
-import React, { useState, useCallback, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "expo-router";
 import CustomCardCarousal from "../../../components/home/CustomCardCarousal";
 import { supabase } from "../../lib/supabase-client";

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  SafeAreaView,
   Text,
   View,
   TextInput,
@@ -9,6 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { ContactRow } from "../../../components/friends/ContactRow";

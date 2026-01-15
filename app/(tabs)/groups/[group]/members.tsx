@@ -1,10 +1,5 @@
-import {
-  Text,
-  View,
-  StyleSheet,
-  Alert,
-  SafeAreaView,
-} from "react-native";
+import { Text, View, StyleSheet, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, Stack } from "expo-router";
 import { supabase } from "../../../lib/supabase-client";
@@ -43,7 +38,12 @@ export default function MembersTab() {
         <View style={styles.membersList}>
           {members.map((username) => (
             <View key={username} style={styles.card}>
-              <FontAwesome name="user-circle" size={24} color="#333" style={{ marginRight: 10 }} />
+              <FontAwesome
+                name="user-circle"
+                size={24}
+                color="#333"
+                style={{ marginRight: 10 }}
+              />
               <Text style={styles.cardText}>{username}</Text>
             </View>
           ))}
