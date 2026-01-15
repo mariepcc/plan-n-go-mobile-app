@@ -26,7 +26,7 @@ if (
 export default function MeetingCard({
   title,
   date,
-  places,
+  places = [],
   userId,
   onAddPlace,
   onVote,

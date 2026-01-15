@@ -5,11 +5,12 @@ import {
   View,
   Alert,
   TextInput,
-  Button,
+  ActivityIndicator,
   Text,
   TouchableOpacity,
 } from "react-native";
 import { Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 export default function Account() {
   const [user, setUser] = useState(null);
@@ -90,85 +91,168 @@ export default function Account() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack.Screen options={{ headerShown: true, title: "Account" }} />
-
+    <View style={styles.safeArea}>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          title: "Profile Settings",
+          headerShadowVisible: true,
+          headerStyle: { backgroundColor: "#fff" },
+        }}
+      />
       <View style={styles.container}>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: "#eee" }]}
-            value={user?.email ?? ""}
-            editable={false}
-          />
+        <View style={styles.profileHeader}>
+          <View style={styles.avatarPlaceholder}>
+            <Ionicons name="person" size={50} color="#0a1c6494" />
+          </View>
+          <Text style={styles.headerText}>Manage your account</Text>
         </View>
-
-        <View style={styles.verticallySpaced}>
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email Address</Text>
+          <View style={[styles.inputWrapper, styles.disabledInput]}>
+            <Ionicons
+              name="mail-outline"
+              size={20}
+              color="#9CA3AF"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              value={user?.email ?? ""}
+              editable={false}
+            />
+          </View>
+        </View>
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-            editable={!loading}
-            placeholder={username ?? ""}
-          />
+          <View style={styles.inputWrapper}>
+            <Ionicons
+              name="at-outline"
+              size={20}
+              color="#0a0b41"
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              value={username}
+              onChangeText={setUsername}
+              editable={!loading}
+              placeholder="Enter your username"
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
         </View>
-
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Button
-            title={loading ? "Loading..." : "Update"}
-            onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
-            disabled={loading}
-            color="#000968"
-          />
-        </View>
-
-        <View style={styles.verticallySpaced}>
-          <TouchableOpacity onPress={doLogout} style={styles.buttonContainer}>
-            <Text style={styles.buttonText}>LOGOUT</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[styles.primaryButton, loading && styles.buttonDisabled]}
+          onPress={() => updateProfile({ username, avatar_url: avatarUrl })}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.primaryButtonText}>Save Changes</Text>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={doLogout} style={styles.logoutButton}>
+          <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+          <Text style={styles.logoutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingTop: 20,
+  },
   container: {
-    marginTop: 40,
-    padding: 12,
+    paddingHorizontal: 24,
+    paddingTop: 20,
   },
-  verticallySpaced: {
-    marginVertical: 8,
+  profileHeader: {
+    alignItems: "center",
+    marginBottom: 32,
   },
-  mt20: {
-    marginTop: 20,
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  headerText: {
+    fontSize: 16,
+    color: "#6B7280",
+    fontWeight: "500",
+  },
+  inputGroup: {
+    marginBottom: 20,
   },
   label: {
-    marginBottom: 4,
-    fontWeight: "bold",
     fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 8,
+    marginLeft: 4,
+  },
+  inputWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FAFB",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+  },
+  inputIcon: {
+    marginRight: 12,
   },
   input: {
-    borderWidth: 1,
-    borderColor: "#999",
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    flex: 1,
+    paddingVertical: 14,
     fontSize: 16,
+    color: "#1F2937",
   },
-  buttonContainer: {
-    backgroundColor: "#a64d79",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    margin: 8,
+  disabledInput: {
+    backgroundColor: "#F3F4F6",
+    borderColor: "#F3F4F6",
   },
-  buttonText: {
-    fontSize: 18,
+  primaryButton: {
+    backgroundColor: "#0a1c6494",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 10,
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  buttonDisabled: {
+    backgroundColor: "#A5A6F6",
+  },
+  primaryButtonText: {
     color: "#fff",
-    fontWeight: "bold",
-    alignSelf: "center",
-    textTransform: "uppercase",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
+    paddingVertical: 12,
+  },
+  logoutButtonText: {
+    color: "#EF4444",
+    fontSize: 16,
+    fontWeight: "600",
+    marginLeft: 8,
   },
 });

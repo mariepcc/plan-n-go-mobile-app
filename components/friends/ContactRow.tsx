@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-
 export function ContactRow({
   item,
   handleDeleteContact,
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
   actionContainer: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: "#e06666",
+    backgroundColor: "#2a27277a",
     borderRadius: 6,
   },
   actionText: {

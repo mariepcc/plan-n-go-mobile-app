@@ -33,7 +33,7 @@ export default function MembersTab() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.membersList}>
           {members.map((username) => (
@@ -49,34 +49,27 @@ export default function MembersTab() {
           ))}
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
+    padding: 10,
   },
   membersList: {
     flexDirection: "column",
-    gap: 12,
+    gap: 8,
   },
   card: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#fefbfb",
     borderRadius: 20,
-    padding: 16,
-    marginVertical: 10,
+    padding: 18,
     marginHorizontal: 16,
-    marginTop: 10,
+    marginTop: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -85,5 +78,6 @@ const styles = StyleSheet.create({
   cardText: {
     fontSize: 16,
     fontWeight: "600",
+    paddingLeft: 10,
   },
 });

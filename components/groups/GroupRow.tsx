@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from "react-native";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
 
 type Props = {
@@ -9,11 +9,7 @@ type Props = {
 export default function GroupRow({ title }: Props) {
   return (
     <View style={styles.item}>
-      <FontAwesomeIcon
-        icon={faPeopleGroup}
-        size={24}
-        style={styles.icon}
-      />
+      <FontAwesomeIcon icon={faPeopleGroup} size={24} style={styles.icon} />
       <View>
         <Text style={styles.title}>{title}</Text>
       </View>
@@ -28,10 +24,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomColor: "#ddd",
     borderBottomWidth: 1,
-    width: "100%"
+    width: "100%",
   },
   icon: {
-    color: "#7a297a",
+    color: "#0a1c6494",
     marginRight: 30,
   },
   title: {

@@ -38,8 +38,7 @@ export default function CostsTab() {
     } else if (data) {
       setExpenses(data);
 
-      // Initialize selectedMembers based on who already returned money
-      const returnedUserIds = new Set(
+      const returnedUserIds = new Set<string>(
         data
           .filter((expense) => expense.is_returned)
           .map((expense) => expense.user_id)
@@ -67,7 +66,7 @@ export default function CostsTab() {
     if (error) {
       console.error("Failed to update is_returned status:", error);
     } else {
-      fetchExpenses(); // Refresh expenses after update
+      fetchExpenses();
     }
   };
 
@@ -99,41 +98,60 @@ export default function CostsTab() {
                   }}
                 >
                   <LinearGradient
-                    colors={["#fffefa", "#ffe8a3"]}
+                    colors={["#ffecd2be", "#f6f4f247", "#9fd4fcbe"]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     style={styles.card}
                   >
-                    <Text style={styles.cardTitle}>{item.meeting_title}</Text>
-                    <Text style={styles.cardAmount}>
-                      You spent:{" "}
-                      <Text style={styles.cardAmountValue}>
-                        {item.amount} zł
-                      </Text>
-                    </Text>
+                    <View style={styles.cardHeader}>
+                      <View>
+                        <Text style={styles.cardTitle}>
+                          {item.meeting_title}
+                        </Text>
+                        <Text style={styles.cardAmount}>
+                          You spent:{" "}
+                          <Text style={styles.cardAmountValue}>
+                            {item.amount} zł
+                          </Text>
+                        </Text>
+                      </View>
+                      {isCreatedByMe && (
+                        <Ionicons
+                          name={
+                            isExpanded
+                              ? "chevron-up-circle"
+                              : "chevron-down-circle"
+                          }
+                          size={25}
+                          color="#081f38"
+                        />
+                      )}
+                    </View>
                     {!isCreatedByMe && (
-                      <Text
+                      <View
                         style={[
-                          styles.cardStatus,
-                          { color: item.is_returned ? "#13690D" : "#A21212" },
+                          styles.statusBadge,
+                          {
+                            backgroundColor: item.is_returned
+                              ? "#DCFCE7"
+                              : "#FEE2E2",
+                          },
                         ]}
                       >
-                        {item.is_returned ? "Returned" : "Not Returned"}
-                      </Text>
+                        <Text
+                          style={[
+                            styles.statusText,
+                            { color: item.is_returned ? "#166534" : "#991B1B" },
+                          ]}
+                        >
+                          {item.is_returned ? "Returned" : "Pending"}
+                        </Text>
+                      </View>
                     )}
-
-                    {isCreatedByMe && (
-                      <Ionicons
-                        name={isExpanded ? "chevron-up" : "chevron-down"}
-                        size={22}
-                        color="#7a297a"
-                        style={styles.expandIcon}
-                      />
-                    )}
-
                     {isCreatedByMe && isExpanded && (
-                      <>
-                        <Text>Who owes you: </Text>
+                      <View style={styles.expandedSection}>
+                        <View style={styles.divider} />
+                        <Text style={styles.sectionTitle}>Who owes you:</Text>
                         <FlatList
                           data={expenses.filter(
                             (expense) =>
@@ -167,7 +185,7 @@ export default function CostsTab() {
                                   <FontAwesome
                                     name="check-circle"
                                     size={20}
-                                    color="#007AFF"
+                                    color="#081f38"
                                   />
                                 ) : (
                                   <FontAwesome name="circle-thin" size={20} />
@@ -176,7 +194,7 @@ export default function CostsTab() {
                             </TouchableOpacity>
                           )}
                         />
-                      </>
+                      </View>
                     )}
                   </LinearGradient>
                 </TouchableOpacity>
@@ -203,49 +221,77 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   card: {
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    borderRadius: 24,
+    padding: 20,
+    marginHorizontal: 16,
+    marginVertical: 10,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
     elevation: 3,
-    borderColor: "#ffe8a3",
-    borderWidth: 0.5,
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   cardTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 6,
-  },
-  expandIcon: {
-    position: "absolute",
-    top: 15,
-    right: 15,
-    zIndex: 1,
-  },
-  cardAmount: {
-    fontSize: 15,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1F2937",
     marginBottom: 4,
   },
-  cardAmountValue: {
-    fontWeight: "bold",
-  },
-  cardStatus: {
+  cardAmount: {
     fontSize: 14,
-    marginTop: 5,
+    color: "#6B7280",
+  },
+  cardAmountValue: {
+    color: "#111827",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  statusBadge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  expandedSection: {
+    marginTop: 16,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F3F4F6",
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#9CA3AF",
+    textTransform: "uppercase",
+    marginBottom: 8,
+    letterSpacing: 0.5,
   },
   listItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    marginLeft: 10,
-    marginRight: 10,
+    paddingVertical: 10,
+    backgroundColor: "#afcbe210",
+    borderRadius: 12,
+    marginBottom: 8,
+    paddingHorizontal: 12,
   },
+
   iconLeft: {
     marginRight: 20,
   },

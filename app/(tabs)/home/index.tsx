@@ -7,7 +7,6 @@ import {
   Text,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "expo-router";
 import CustomCardCarousal from "../../../components/home/CustomCardCarousal";
@@ -81,9 +80,8 @@ export default function Page() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: true, title: "Home" }} />
-
+    <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: true, title: "Your meetings" }} />
       <View style={styles.carouselContainer}>
         <Text style={styles.text}>Upcoming meetings:</Text>
         {upcomingMeetings.length > 0 ? (
@@ -94,7 +92,7 @@ export default function Page() {
             pagination={true}
           />
         ) : (
-          <NoMeetingsCard message="No upcoming meetings yet. Why not create one?" />
+          <NoMeetingsCard message="No upcoming meetings yet." />
         )}
       </View>
 
@@ -111,14 +109,13 @@ export default function Page() {
           <NoMeetingsCard message="No past meetings. Start planning your first meeting now!" />
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     backgroundColor: "white",
   },
   card: {
@@ -138,7 +135,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#2E3A59",
     marginBottom: 12,
-    marginTop: 20,
+    marginTop: 50,
     fontSize: 18,
     fontWeight: "600",
     letterSpacing: 0.5,
@@ -147,16 +144,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 2,
   },
   carouselContainer: {
-    marginTop: 15,
-  },
-  noMeetingCard: {
-    marginHorizontal: 20,
-    marginVertical: 30,
-    padding: 20,
-    borderRadius: 15,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
+    marginTop: 10,
   },
   noMeetingText: {
     fontSize: 16,

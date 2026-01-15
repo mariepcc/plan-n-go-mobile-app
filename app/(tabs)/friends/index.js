@@ -8,7 +8,6 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
 import { supabase } from "../../lib/supabase-client";
 import { ContactRow } from "../../../components/friends/ContactRow";
@@ -113,9 +112,9 @@ export default function FriendsIndex() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ padding: 20, flex: 1 }}>
       <Stack.Screen options={{ headerShown: true, title: "Friends" }} />
-      <View style={{ padding: 16 }}>
+      <View style={{ paddingHorizontal: 5, width: "100%", flex: 1 }}>
         <TextInput
           style={styles.input}
           placeholder="Search..."
@@ -136,7 +135,6 @@ export default function FriendsIndex() {
             No user found.
           </Text>
         )}
-
         <FlatList
           data={[...profiles, ...contacts]}
           extraData={contacts}
@@ -152,7 +150,7 @@ export default function FriendsIndex() {
           }
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -161,19 +159,25 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   input: {
-    borderColor: "#040405",
-    borderRadius: 10,
-    borderStyle: "solid",
+    backgroundColor: "#F9FAFB",
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
     borderWidth: 1,
-    padding: 12,
-    margin: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
+    marginVertical: 8,
+    fontSize: 16,
+    color: "#1F2937",
+    width: "100%",
   },
   buttonContainer: {
-    backgroundColor: "#2193b0",
-    borderRadius: 10,
+    backgroundColor: "#efb271",
+    borderRadius: 12,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    margin: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   buttonText: {
     fontSize: 18,

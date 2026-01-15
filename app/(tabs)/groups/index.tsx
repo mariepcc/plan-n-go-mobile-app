@@ -5,7 +5,6 @@ import {
   TextInput,
   FlatList,
   StyleSheet,
-  Button,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,7 +39,7 @@ export default function GroupsPage() {
   const sendNotification = () => {
     scheduleNotificationAsync({
       content: {
-        title: "🧪 Test notification!",
+        title: "Test notification!",
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
@@ -83,9 +82,9 @@ export default function GroupsPage() {
   const newGroup = search ? [{ type: "create", name: search }] : [];
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       <Stack.Screen options={{ headerShown: true, title: "Groups" }} />
-      <View style={{ padding: 16 }}>
+      <View style={{ paddingVertical: 16, paddingHorizontal: 25, flex: 1 }}>
         <TextInput
           style={styles.input}
           placeholder="Search..."
@@ -122,29 +121,15 @@ export default function GroupsPage() {
           }
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
   verticallySpaced: {
     paddingTop: 4,
     paddingBottom: 4,
     alignSelf: "stretch",
-  },
-  mt20: {
-    marginTop: 20,
-  },
-  buttonContainer: {
-    backgroundColor: "#000968",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    margin: 8,
   },
   buttonText: {
     fontSize: 18,
@@ -154,12 +139,16 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
   },
   input: {
-    borderColor: "#040405",
-    borderRadius: 10,
-    borderStyle: "solid",
+    backgroundColor: "#F9FAFB",
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
     borderWidth: 1,
-    padding: 12,
-    margin: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    marginVertical: 12,
+    fontSize: 16,
+    color: "#1F2937",
+    width: "100%",
   },
   emptyPlaceholder: {
     alignItems: "center",
